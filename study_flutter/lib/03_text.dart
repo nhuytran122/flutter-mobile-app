@@ -25,6 +25,17 @@ class MyWidget extends StatelessWidget {
       maxLines: 3,
       overflow: TextOverflow.ellipsis,
       textScaleFactor: 1.5,
+      style: TextStyle(
+        color: Colors.blue,
+        backgroundColor: Color.fromARGB(255, 233, 140, 172),
+        fontSize: 15,
+        fontWeight: FontWeight.w400,
+        fontStyle: FontStyle.italic,
+        fontFamily: 'Time New Roman',
+        wordSpacing: 15,
+        letterSpacing: 5,
+        decoration: TextDecoration.lineThrough,
+      ),
     );
   }
 }
