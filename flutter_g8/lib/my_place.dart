@@ -2,12 +2,23 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-class MyPlace extends StatelessWidget {
+class MyPlace extends StatefulWidget {
   MyPlace({super.key});
+
+  @override
+  State<MyPlace> createState() => _MyPlaceState();
+}
+
+class _MyPlaceState extends State<MyPlace> {
   String bannerUrl =
       "https://imgcdn.tapchicongthuong.vn/tcct-media/24/4/19/dh-kh-dh-hue_662296164dae2.jpg";
+
   String content =
       "Được mệnh danh là một trong những bãi biển quyến rũ nhất hành tinh, Mỹ Khê nhanh chóng trở thành điểm đến thu hút đông đảo khách du lịch trong và ngoài nước. Không những vậy, biển Mỹ Khê còn nhận được sự quan tâm đặc biệt của báo chí quốc tế bởi nét đẹp quyến rũ, non nước hữu tình. Bởi vậy, đến Đà Nẵng mà không ghé thăm Mỹ Khê thì thực sự là một sự bỏ lỡ đáng tiếc.";
+
+  bool likeStatus = true;
+  int countLike = 41;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,9 +47,9 @@ class MyPlace extends StatelessWidget {
 
   Widget header() {
     return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, top: 40, bottom: 40),
+      padding: const EdgeInsets.all(20),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,12 +71,23 @@ class MyPlace extends StatelessWidget {
           ),
           Row(
             children: [
-              Icon(
-                Icons.star,
-                color: Colors.red,
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    if (likeStatus) {
+                      countLike -= 1;
+                    } else
+                      countLike += 1;
+                    likeStatus = !likeStatus;
+                  });
+                },
+                child: Icon(
+                  Icons.star,
+                  color: likeStatus ? Colors.red : Colors.black54,
+                ),
               ),
               Text(
-                "41",
+                "${countLike}",
               )
             ],
           )
@@ -104,7 +126,7 @@ class MyPlace extends StatelessWidget {
 
   Widget description() {
     return Padding(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       child: Text(content),
     );
   }
