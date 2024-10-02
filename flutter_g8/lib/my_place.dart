@@ -38,7 +38,7 @@ class _MyPlaceState extends State<MyPlace> {
       height: 300,
       decoration: BoxDecoration(
         image: DecorationImage(
-          fit: BoxFit.cover,
+          fit: BoxFit.cover, //Hình ảnh sẽ tự điều chỉnh để lấp đầy toàn bộ `Container`, giữ nguyên tỷ lệ mà không bị méo.
           image: NetworkImage(bannerUrl),
         ),
       ),
@@ -71,7 +71,7 @@ class _MyPlaceState extends State<MyPlace> {
           ),
           Row(
             children: [
-              InkWell(
+              InkWell( //InkWell: Widget này có khả năng bắt sự kiện chạm (tap).
                 onTap: () {
                   setState(() {
                     if (likeStatus) {
