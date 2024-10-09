@@ -3,6 +3,7 @@ import 'package:flutter_g8/my_homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_g8/my_idol.dart';
 import 'package:flutter_g8/my_place.dart';
+import 'package:flutter_g8/my_productlist.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: MyClassroom(),
+      home: MyProductList(),
       debugShowCheckedModeBanner: false,
     );
   }
