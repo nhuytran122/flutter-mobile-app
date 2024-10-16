@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_g8/entity/shoppingcart.dart';
 
 class MyShoppingCart extends StatefulWidget {
   const MyShoppingCart({super.key});
@@ -14,13 +15,33 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
       appBar: myAppBar(context),
       body: Column(
         children: [
-          Expanded(
-            child: ListView(
-              children: List.generate(10, (index) => item()),
-            ),
-          ),
+          shoppingCart.items.length > 0
+              ? myShoppingCart()
+              : myEmptyShoppingCart(),
           myBottom(),
         ],
+      ),
+    );
+  }
+
+  Widget myEmptyShoppingCart() {
+    return Expanded(
+      child: Center(
+        child: Text(
+          "YOUR CART IS EMPTY",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Expanded myShoppingCart() {
+    return Expanded(
+      child: ListView(
+        children: List.generate(10, (index) => item()),
       ),
     );
   }
