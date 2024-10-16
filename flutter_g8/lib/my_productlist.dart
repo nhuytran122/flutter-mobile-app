@@ -26,11 +26,14 @@ class MyProductList extends StatelessWidget {
           Stack(
             children: [
               IconButton(
-                  onPressed: () => null,
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/shoppingcart");
+                  },
                   icon: Icon(
                     Icons.shopping_cart,
                     color: Colors.black,
-                  )),
+                  ),
+              ),
               Positioned(
                 right: 5,
                 top: 5,
