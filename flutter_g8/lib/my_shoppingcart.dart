@@ -91,14 +91,15 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
     return AppBar(
       backgroundColor: Colors.blue,
       leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-            size: 30,
-          )),
+        onPressed: () {
+          Navigator.pop(context, true);
+        },
+        icon: Icon(
+          Icons.arrow_back,
+          color: Colors.white,
+          size: 30,
+        ),
+      ),
       title: Text(
         "My Shopping Cart",
         style: TextStyle(
@@ -106,32 +107,46 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
         ),
       ),
       actions: [
-        Stack(
-          children: [
-            IconButton(
-              onPressed: () => null,
-              icon: Icon(
-                Icons.shopping_cart,
-                color: Colors.white,
-              ),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Positioned(
-              right: 5,
-              top: 5,
-              child: Container(
-                height: 10,
-                width: 10,
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
+        if (shoppingCart.items.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(right: 5),
+            child: Stack(
+              children: [
+                IconButton(
+                  onPressed: () => null,
+                  icon: Icon(
+                    Icons.shopping_cart,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-            )
-          ],
-        ),
+                SizedBox(
+                  width: 10,
+                ),
+                Positioned(
+                  right: 5,
+                  top: 5,
+                  child: Container(
+                    height: 15,
+                    width: 15,
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${shoppingCart.items.length}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
       ],
     );
   }
