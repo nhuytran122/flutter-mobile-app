@@ -26,7 +26,7 @@ class ShoppingCart {
   void add(Product product, {int quantity = 1}) {
     for (ItemInCart it in items) {
       if (it.name == product.name) {
-        it.quantity += quantity;
+        it.quantity += 1;
         return;
       }
     }

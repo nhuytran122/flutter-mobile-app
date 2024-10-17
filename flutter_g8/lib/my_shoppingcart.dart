@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_g8/entity/product.dart';
 import 'package:flutter_g8/entity/shoppingcart.dart';
 
 class MyShoppingCart extends StatefulWidget {
@@ -15,7 +16,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
       appBar: myAppBar(context),
       body: Column(
         children: [
-          shoppingCart.items.length > 0
+          shoppingCart.items.isNotEmpty
               ? myShoppingCart()
               : myEmptyShoppingCart(),
           myBottom(),
@@ -41,7 +42,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
   Expanded myShoppingCart() {
     return Expanded(
       child: ListView(
-        children: List.generate(10, (index) => item()),
+        children: shoppingCart.items.map((e) => item(e)).toList(),
       ),
     );
   }
@@ -61,7 +62,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Sub total:"),
-                Text("\$50.00"),
+                Text("\$${shoppingCart.getTotal().toStringAsFixed(2)}"),
               ],
             ),
           ),
@@ -135,7 +136,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
     );
   }
 
-  Widget item() {
+  Widget item(ItemInCart it) {
     return Container(
       child: Card(
         child: ListTile(
@@ -143,7 +144,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
             height: 50,
             width: 50,
             decoration: BoxDecoration(
-              color: Colors.red,
+              color: it.avtColor,
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -153,33 +154,47 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Name: KIWI"),
-                  Text("Unit: Kg"),
-                  Text("Price: \$20"),
+                  Text("Name: ${it.name}"),
+                  Text("Unit: ${it.unit}"),
+                  Text("Price: \$${it.price.toStringAsFixed(2)}"),
                 ],
               ),
               Row(
                 children: [
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => null,
-                        icon: Icon(Icons.remove),
-                      ),
-                      Text("2"),
-                      IconButton(
-                        onPressed: () => null,
-                        icon: Icon(Icons.add),
-                      ),
-                    ],
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        shoppingCart.remove(it);
+                      });
+                    },
+                    icon: Icon(Icons.remove),
+                  ),
+                  Text("${it.quantity}"),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        shoppingCart.add(Product(
+                          it.name,
+                          it.unit,
+                          it.price,
+                          avtImage: it.avtImage,
+                          avtColor: it.avtColor,
+                        ));
+                      });
+                    },
+                    icon: Icon(Icons.add),
                   ),
                   IconButton(
-                    onPressed: () => null,
+                    onPressed: () {
+                      setState(() {
+                        shoppingCart.delete(it);
+                      });
+                    },
                     icon: Icon(Icons.delete),
                     color: Colors.red,
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),

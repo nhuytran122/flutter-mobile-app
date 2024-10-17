@@ -1,64 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_g8/entity/product.dart';
+import 'package:flutter_g8/entity/shoppingcart.dart';
 
 class MyProductList extends StatelessWidget {
   MyProductList({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        leading: IconButton(
-          onPressed: () => null,
-          icon: Icon(
-            Icons.home,
-            color: Colors.white,
-            size: 30,
-          ),
-        ),
-        title: Text(
-          "PRODUCT LIST",
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
-        actions: [
-          Stack(
-            children: [
-              IconButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, "/shoppingcart");
-                  },
-                  icon: Icon(
-                    Icons.shopping_cart,
-                    color: Colors.black,
-                  ),
-              ),
-              Positioned(
-                right: 5,
-                top: 5,
-                child: Container(
-                  height: 10,
-                  width: 10,
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              )
-            ],
-          ),
-          IconButton(
-              onPressed: () => null,
-              icon: Icon(Icons.notifications, color: Colors.white)),
-          IconButton(
-              onPressed: () => null,
-              icon: Icon(Icons.search, color: Colors.amber)),
-        ],
-      ),
+      appBar: myAppBar(context),
       body: ListView(
         children: listProducts.map((e) => item(e)).toList(),
       ),
+    );
+  }
+
+  AppBar myAppBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: Colors.blue,
+      leading: IconButton(
+        onPressed: () => null,
+        icon: Icon(
+          Icons.home,
+          color: Colors.white,
+          size: 30,
+        ),
+      ),
+      title: Text(
+        "PRODUCT LIST",
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      actions: [
+        Stack(
+          children: [
+            IconButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, "/shoppingcart");
+                },
+                icon: Icon(
+                  Icons.shopping_cart,
+                  color: Colors.black,
+                ),
+            ),
+            Positioned(
+              right: 5,
+              top: 5,
+              child: Container(
+                height: 10,
+                width: 10,
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            )
+          ],
+        ),
+        IconButton(
+            onPressed: () => null,
+            icon: Icon(Icons.notifications, color: Colors.white)),
+        IconButton(
+            onPressed: () => null,
+            icon: Icon(Icons.search, color: Colors.amber)),
+      ],
     );
   }
 
@@ -87,7 +92,9 @@ class MyProductList extends StatelessWidget {
             ],
           ),
           trailing: ElevatedButton(
-            onPressed: () => null,
+            onPressed: () {
+              shoppingCart.add(p);
+            },
             child: Text("Add to cart"),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
