@@ -107,47 +107,50 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
         ),
       ),
       actions: [
-        if (shoppingCart.items.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(right: 5),
-            child: Stack(
-              children: [
-                IconButton(
-                  onPressed: () => null,
-                  icon: Icon(
-                    Icons.shopping_cart,
-                    color: Colors.white,
-                  ),
+        Padding(
+          padding: const EdgeInsets.only(right: 5),
+          child: Stack(
+            children: [
+              IconButton(
+                onPressed: () => null,
+                icon: Icon(
+                  Icons.shopping_cart,
+                  color: Colors.white,
                 ),
-                SizedBox(
-                  width: 10,
-                ),
-                Positioned(
-                  right: 5,
-                  top: 5,
-                  child: Container(
-                    height: 15,
-                    width: 15,
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '${shoppingCart.items.length}',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              ],
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              shoppingCart.items.length == 0 ? SizedBox.shrink() : myIconCart(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Positioned myIconCart() {
+    return Positioned(
+      right: 5,
+      top: 5,
+      child: Container(
+        height: 15,
+        width: 15,
+        decoration: BoxDecoration(
+          color: Colors.red,
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: Text(
+            '${shoppingCart.items.length}',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
             ),
           ),
-      ],
+        ),
+      ),
     );
   }
 

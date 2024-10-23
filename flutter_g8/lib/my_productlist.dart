@@ -53,28 +53,7 @@ class _MyProductListState extends State<MyProductList> {
                 color: Colors.black,
               ),
             ),
-            Positioned(
-              right: 5,
-              top: 5,
-              child: Container(
-                height: 15,
-                width: 15,
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    '${shoppingCart.items.length}',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            shoppingCart.items.length == 0 ? SizedBox.shrink() : myIconCart(),
           ],
         ),
         IconButton(
@@ -86,6 +65,31 @@ class _MyProductListState extends State<MyProductList> {
           icon: Icon(Icons.search, color: Colors.amber),
         ),
       ],
+    );
+  }
+
+  Positioned myIconCart() {
+    return Positioned(
+      right: 5,
+      top: 5,
+      child: Container(
+        height: 15,
+        width: 15,
+        decoration: BoxDecoration(
+          color: Colors.red,
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: Text(
+            '${shoppingCart.items.length}',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
     );
   }
 
