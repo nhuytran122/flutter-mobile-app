@@ -179,7 +179,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
                   IconButton(
                     onPressed: () {
                       setState(() {
-                        shoppingCart.remove(it);
+                        shoppingCart.addItemInCart(it, quantity: -1);
                       });
                     },
                     icon: Icon(Icons.remove),
@@ -188,13 +188,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
                   IconButton(
                     onPressed: () {
                       setState(() {
-                        shoppingCart.add(Product(
-                          it.name,
-                          it.unit,
-                          it.price,
-                          avtImage: it.avtImage,
-                          avtColor: it.avtColor,
-                        ));
+                        shoppingCart.addItemInCart(it, quantity: 1);
                       });
                     },
                     icon: Icon(Icons.add),
@@ -202,7 +196,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
                   IconButton(
                     onPressed: () {
                       setState(() {
-                        shoppingCart.delete(it);
+                        shoppingCart.remove(it);
                       });
                     },
                     icon: Icon(Icons.delete),
