@@ -1,4 +1,5 @@
 import 'package:flutter_g8/my_classroom.dart';
+import 'package:flutter_g8/my_classroom2.dart';
 import 'package:flutter_g8/my_homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_g8/my_idol.dart';
@@ -16,12 +17,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      routes: {
-        "/productlist": (context) => MyProductList(),
-        "/shoppingcart": (context) => MyShoppingCart()
-      },
-      // home: MyShoppingCart(),
-      initialRoute: "/productlist",
+      // routes: {
+      //   "/productlist": (context) => MyProductList(),
+      //   "/shoppingcart": (context) => MyShoppingCart()
+      // },
+      // // home: MyShoppingCart(),
+      // initialRoute: "/productlist",
+      home: MyClassroom2(),
       debugShowCheckedModeBanner: false,
     );
   }
