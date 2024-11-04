@@ -118,9 +118,6 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
                   color: Colors.white,
                 ),
               ),
-              SizedBox(
-                width: 10,
-              ),
               shoppingCart.items.length == 0 ? SizedBox.shrink() : myIconCart(),
             ],
           ),
