@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_g8/entity/classroom.dart';
 import 'package:flutter_g8/entity/pageviewinfo.dart';
@@ -36,22 +38,86 @@ class _MyClassroom2State extends State<MyClassroom2> {
             decoration: BoxDecoration(
               color: Colors.blue,
             ),
-            child: Text('Google Classroom'),
+            child: Text(
+              'Google Classroom',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
-          ListTile(
-            title: Text('Lớp học'),
-            onTap: () {
-              // Navigate to home page
+          myOptionalInDrawer(
+            Icons.home_outlined,
+            'Lớp học',
+            () {
+              // Xử lý khi nhấn vào "Lớp học"
             },
           ),
-          ListTile(
-            title: Text('Lịch'),
-            onTap: () {
-              // Navigate to settings page
+          myOptionalInDrawer(
+            Icons.calendar_today_outlined,
+            'Lịch',
+            () {
+              // Xử lý khi nhấn vào LLịch"
             },
           ),
+          Divider(),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, top: 8.0),
+            child: Text(
+              'ĐANG GIẢNG DẠY',
+              style: TextStyle(
+                color: Colors.grey,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          // Sử dụng map để tạo các ListTile từ listClassroom
+          ...listClassroom.map((e) => myListTileItem(e)).toList(),
+          Divider(),
+          myOptionalInDrawer(
+              Icons.archive_outlined, 'Lớp học đã lưu trữ', () {}),
+          myOptionalInDrawer(
+              Icons.folder_outlined, 'Thư mục của Lớp học', () {}),
+          myOptionalInDrawer(Icons.settings_outlined, 'Cài đặt', () {}),
+          myOptionalInDrawer(Icons.help_outline, 'Trợ giúp', () {}),
         ],
       ),
+    );
+  }
+
+  ListTile myOptionalInDrawer(
+      IconData iconData, String label, VoidCallback onTap) {
+    return ListTile(
+      leading: Icon(iconData),
+      title: Text(label),
+      onTap: onTap,
+    );
+  }
+
+  Color getRandomColor() {
+    Random r = new Random();
+    return Color.fromARGB(
+      255,
+      r.nextInt(255),
+      r.nextInt(255),
+      r.nextInt(255),
+    );
+  }
+
+  Widget myListTileItem(Classroom classroom) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: getRandomColor(),
+        child: Text(
+          classroom.subject.substring(0, 1),
+        ),
+      ),
+      title: Text(classroom.subject),
+      subtitle: Text(classroom.id),
+      onTap: () {
+        // Xử lý khi nhấn vào lớp học
+      },
     );
   }
 
