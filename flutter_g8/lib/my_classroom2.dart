@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_g8/entity/classroom.dart';
+import 'package:flutter_g8/entity/pageviewinfo.dart';
 
 class MyClassroom2 extends StatefulWidget {
   const MyClassroom2({super.key});
@@ -8,18 +10,15 @@ class MyClassroom2 extends StatefulWidget {
 }
 
 class _MyClassroom2State extends State<MyClassroom2> {
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(),
+      drawer: myDrawer(context),
       appBar: myAppBar(),
       bottomNavigationBar: myBottomNavigationBar(),
       body: Column(
         children: [
-          myTwoButtons(),
+          myRowButtons(),
           myPageView(),
           mybuildDotIndicator(),
         ],
@@ -27,86 +26,117 @@ class _MyClassroom2State extends State<MyClassroom2> {
     );
   }
 
-  Padding mybuildDotIndicator() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(2, (index) {
-          return Container(
-            margin: EdgeInsets.symmetric(horizontal: 4),
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: _currentPage == index ? Colors.blue : Colors.grey,
-            ),
-          );
-        }),
-      ),
-    );
-  }
-
-  Expanded myPageView() {
-    return Expanded(
-      child: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _currentPage = index;
-          });
-        },
+  Widget myDrawer(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 2 / 3,
+      decoration: BoxDecoration(color: Colors.white),
+      child: ListView(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.link, size: 100, color: Colors.blueAccent),
-                  SizedBox(height: 16),
-                  Text(
-                    'Nhận đường liên kết bạn có thể chia sẻ',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Nhấn vào Cuộc họp mới để nhận một đường liên kết mà bạn có thể gửi cho những người mình muốn họp cùng',
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
+          const DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.blue,
             ),
+            child: Text('Google Classroom'),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.lock, size: 100, color: Colors.blueAccent),
-                  SizedBox(height: 16),
-                  Text(
-                    'Cuộc họp luôn an toàn',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Không ai bên ngoài tổ chức của bạn có thể tham gia cuộc họp trừ phi người tổ chức mời hoặc cho phép',
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
+          ListTile(
+            title: Text('Lớp học'),
+            onTap: () {
+              // Navigate to home page
+            },
+          ),
+          ListTile(
+            title: Text('Lịch'),
+            onTap: () {
+              // Navigate to settings page
+            },
           ),
         ],
       ),
     );
   }
 
-  Padding myTwoButtons() {
+  Widget myPageView() {
+    return Expanded(
+      child: PageView(
+        onPageChanged: (value) {
+          setState(() {
+            currentPage = value;
+          });
+        },
+        children: listPageViewMeeting.map((e) => myPageViewItem(e)).toList(),
+      ),
+    );
+  }
+
+  Widget myPageViewItem(PageViewInfo p) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 150,
+            height: 150,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(
+                fit: BoxFit.cover,
+                image: AssetImage(p.avtUrl),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          Center(
+            child: Text(
+              '${p.title}',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            '${p.content}',
+            style: TextStyle(
+              fontSize: 15,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  int currentPage = 0;
+  Widget mybuildDotIndicator() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        listPageViewMeeting.length,
+        (index) => Padding(
+          padding: const EdgeInsets.only(bottom: 20.0),
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 1),
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(
+              color: currentPage == index ? Colors.blue : Colors.grey,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Padding myRowButtons() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -154,22 +184,22 @@ class _MyClassroom2State extends State<MyClassroom2> {
 
   BottomNavigationBar myBottomNavigationBar() {
     return BottomNavigationBar(
+      currentIndex: 2,
+      selectedItemColor: Colors.red,
       items: [
-        myBottomNaviBarItem(Icons.mail),
-        myBottomNaviBarItem(Icons.message),
-        myBottomNaviBarItem(Icons.video_camera_back, color: Colors.red),
+        myBottomNaviBarItem(Icons.mail, 'Email'),
+        myBottomNaviBarItem(Icons.message, 'Message'),
+        myBottomNaviBarItem(Icons.video_camera_back, 'Meeting'),
       ],
     );
   }
 
-  BottomNavigationBarItem myBottomNaviBarItem(IconData iconData,
-      {Color? color}) {
+  BottomNavigationBarItem myBottomNaviBarItem(IconData iconData, String label) {
     return BottomNavigationBarItem(
       icon: Icon(
         iconData,
-        color: color ?? Colors.black,
       ),
-      label: '',
+      label: label,
     );
   }
 
