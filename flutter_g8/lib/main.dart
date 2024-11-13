@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_g8/my_idol.dart';
 import 'package:flutter_g8/my_place.dart';
 import 'package:flutter_g8/my_productlist.dart';
+import 'package:flutter_g8/my_shop.dart';
 import 'package:flutter_g8/my_shoppingcart.dart';
 
 void main() {
@@ -17,12 +18,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // routes: {
-      //   "/productlist": (context) => MyProductList(),
-      //   "/shoppingcart": (context) => MyShoppingCart()
-      // },
-      // // home: MyShoppingCart(),
-      // initialRoute: "/productlist",
+      routes: {
+        "/productlist": (context) => MyProductList(),
+        "/shoppingcart": (context) => MyShoppingCart(),
+        "/shop": (context) => MyShop(),
+      },
+      // home: MyShoppingCart(),
+      initialRoute: "/shop",
       home: MyClassroom2(),
       debugShowCheckedModeBanner: false,
     );
