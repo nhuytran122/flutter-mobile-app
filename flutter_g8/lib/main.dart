@@ -6,7 +6,9 @@ import 'package:flutter_g8/my_idol.dart';
 import 'package:flutter_g8/my_place.dart';
 import 'package:flutter_g8/my_productlist.dart';
 import 'package:flutter_g8/my_shop.dart';
+import 'package:flutter_g8/my_shop_online.dart';
 import 'package:flutter_g8/my_shoppingcart.dart';
+import 'package:flutter_g8/my_shoppingcart2.dart';
 
 void main() {
   runApp(MyApp());
@@ -22,10 +24,17 @@ class MyApp extends StatelessWidget {
         "/productlist": (context) => MyProductList(),
         "/shoppingcart": (context) => MyShoppingCart(),
         "/shop": (context) => MyShop(),
+        "/idol": (context) => MyIdol(),
+        "/place": (context) => MyPlace(),
+        "/homepage": (context) => MyHomepage(),
+        "/classroom": (context) => MyClassroom(),
+        "/classroom2": (context) => MyClassroom2(),
+        "/myshoponline": (context) => MyShopOnline(),
+        "/shoppingcart2": (context) => MyShoppingCart2(),
       },
       // home: MyShoppingCart(),
-      initialRoute: "/shop",
-      home: MyClassroom2(),
+      initialRoute: "/myshoponline",
+      home: MyShopOnline(),
       debugShowCheckedModeBanner: false,
     );
   }

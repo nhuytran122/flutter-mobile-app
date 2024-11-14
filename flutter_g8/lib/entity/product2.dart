@@ -28,6 +28,13 @@ class Product2 {
       rating: Rating.fromJson(json['rating']),
     );
   }
+
+  static List<Product2> filterByCategory(
+      List<Product2> products, String category) {
+    var filteredProducts =
+        products.where((product) => product.category == category).toList();
+    return filteredProducts;
+  }
 }
 
 class Rating {
