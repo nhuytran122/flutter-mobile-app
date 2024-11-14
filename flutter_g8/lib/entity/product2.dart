@@ -5,8 +5,7 @@ class Product2 {
   String description;
   String category;
   String image;
-  //TODO: xử lý
-  late Rating rating;
+  Rating rating;
 
   Product2({
     required this.id,
@@ -15,10 +14,10 @@ class Product2 {
     required this.description,
     required this.category,
     required this.image,
-    // required this.rating,
+    required this.rating,
   });
 
-  factory Product2.fromJson(Map<String, dynamic> json){
+  factory Product2.fromJson(Map<String, dynamic> json) {
     return Product2(
       id: json['id'],
       title: json['title'],
@@ -26,7 +25,7 @@ class Product2 {
       description: json['description'],
       category: json['category'],
       image: json['image'],
-      // rating: Rating.fromJson(json['rating']),
+      rating: Rating.fromJson(json['rating']),
     );
   }
 }
@@ -39,4 +38,11 @@ class Rating {
     required this.rate,
     required this.count,
   });
+
+  factory Rating.fromJson(Map<String, dynamic> json) {
+    return Rating(
+      rate: json['rate'],
+      count: json['count'],
+    );
+  }
 }

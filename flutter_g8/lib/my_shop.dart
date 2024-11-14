@@ -21,6 +21,7 @@ class _MyShopState extends State<MyShop> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: myAppBar(),
       body: FutureBuilder(
         future: lsProduct2,
         builder: (context, snapshot) {
@@ -42,6 +43,67 @@ class _MyShopState extends State<MyShop> {
   }
 
   Widget MyItem(Product2 p) {
-    return ListTile(title: Text(p.title));
+    return Container(
+      child: Card(
+        child: ListTile(
+          leading: Image.network(
+            p.image,
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
+          ),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              itemText("Name", "${p.title}"),
+              itemText("Category", "${p.category}"),
+              itemText("Price", "\$${p.price}"),
+            ],
+          ),
+          trailing: ElevatedButton(
+            onPressed: () {
+              setState(() {});
+            },
+            child: Text("Add to cart"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Text itemText(String label, String value) {
+    return Text.rich(TextSpan(text: "${label}: ", children: [
+      TextSpan(
+          text: "${value}",
+          style: TextStyle(
+            color: Colors.red,
+            fontWeight: FontWeight.bold,
+          ))
+    ]));
+  }
+
+  AppBar myAppBar() {
+    return AppBar(
+      backgroundColor: Colors.blue,
+      leading: IconButton(
+        onPressed: () => null,
+        icon: Icon(
+          Icons.home,
+          color: Colors.white,
+          size: 30,
+        ),
+      ),
+      title: Text(
+        "PRODUCT LIST",
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      actions: [],
+    );
   }
 }
