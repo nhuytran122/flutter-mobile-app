@@ -3,6 +3,7 @@ import 'package:flutter_g8/my_classroom2.dart';
 import 'package:flutter_g8/my_homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_g8/my_idol.dart';
+import 'package:flutter_g8/my_list_prd_category.dart';
 import 'package:flutter_g8/my_place.dart';
 import 'package:flutter_g8/my_productlist.dart';
 import 'package:flutter_g8/my_shop.dart';
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
         "/classroom2": (context) => MyClassroom2(),
         "/myshoponline": (context) => MyShopOnline(),
         "/shoppingcart2": (context) => MyShoppingCart2(),
+        // "/listproductsflcate":(context) => MyListPrdCategory(category: category, allProducts: allProducts)
       },
       // home: MyShoppingCart(),
       initialRoute: "/myshoponline",

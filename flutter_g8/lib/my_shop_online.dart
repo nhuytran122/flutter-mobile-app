@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_g8/entity/product2.dart';
 import 'package:flutter_g8/entity/shoppingcart2.dart';
+import 'package:flutter_g8/my_list_prd_category.dart';
 import 'package:flutter_g8/utils/api_service.dart';
 
 class MyShopOnline extends StatefulWidget {
@@ -16,19 +17,12 @@ class _MyShopOnlineState extends State<MyShopOnline> {
   List<Product2> listProducts = [];
   List<String> listCategories = [];
   int currentPage = 0;
-  String selectedCategory = ''; // Phân loại đã chọn
+  String selectedCategory = '';
 
   @override
   void initState() {
     super.initState();
     lsProduct2 = ApiService.getAllProduct();
-    lsProduct2.then((products) {
-      setState(() {
-        allProducts = products;
-        listProducts = allProducts;
-        listCategories = getCategories(allProducts); // Lấy danh sách phân loại
-      });
-    });
   }
 
   List<String> getCategories(List<Product2> products) {
@@ -49,7 +43,21 @@ class _MyShopOnlineState extends State<MyShopOnline> {
       appBar: myAppBar(context),
       body: Column(
         children: [
-          Expanded(child: myPageView()), // Đặt PageView trong Expanded
+          Expanded(
+            child: FutureBuilder<List<Product2>>(
+              future: lsProduct2,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                {
+                  allProducts = snapshot.data!;
+                  listCategories = getCategories(allProducts);
+                  return MyPageView();
+                }
+              },
+            ),
+          ),
           myBuildDotIndicator(),
         ],
       ),
@@ -63,48 +71,60 @@ class _MyShopOnlineState extends State<MyShopOnline> {
     );
   }
 
-  Widget myPageView() {
+  PageView MyPageView() {
     return PageView(
-      onPageChanged: (value) {
+      onPageChanged: (index) {
         setState(() {
-          currentPage = value;
+          currentPage = index;
         });
       },
       children: [
-        SizedBox(
-          height: 300,
-          child: GridView.builder(
-            padding: EdgeInsets.all(8.0),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              childAspectRatio: 0.9,
-            ),
-            itemCount: listProducts.length,
-            itemBuilder: (context, index) {
-              return buildProductCard(listProducts[index]);
-            },
+        GridView.builder(
+          padding: const EdgeInsets.all(8.0),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            childAspectRatio: 0.7,
           ),
+          itemCount: allProducts.length,
+          itemBuilder: (context, index) {
+            return buildProductCard(allProducts[index]);
+          },
         ),
-        // Page 2: Display categories
-        SizedBox(
-          height: 300,
-          child: GridView.builder(
-            padding: EdgeInsets.all(8.0),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1.0,
-            ),
-            itemCount: listCategories.length,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  getProductsByCategory(listCategories[index]);
-                },
-                child: buildCategoryCard(listCategories[index]),
-              );
-            },
+        GridView.builder(
+          padding: EdgeInsets.all(8.0),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 1.0,
           ),
-        ),
+          itemCount: listCategories.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => MyListPrdCategory(
+                      category: listCategories[index],
+                      allProducts: allProducts,
+                    ),
+                  ),
+                );
+                // Navigator.pushNamed(
+                //   context,
+                //   "/listproductsflcate",
+                //   arguments: {
+                //     'category': selectedCategory,
+                //     'allProducts': allProducts,
+                //   },
+                // ).then((value) {
+                //   if (value == true) {
+                //     setState(() {});
+                //   }
+                // });
+              },
+              child: buildCategoryCard(listCategories[index]),
+            );
+          },
+        )
       ],
     );
   }
@@ -115,16 +135,25 @@ class _MyShopOnlineState extends State<MyShopOnline> {
         children: [
           Image.network(
             p.image,
-            height: 100,
-            width: 100,
+            height: 80,
+            width: 80,
             fit: BoxFit.cover,
           ),
+          SizedBox(height: 8),
           Text(
             p.title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          Text('\$${p.price}'),
+          SizedBox(height: 8),
+          Text(
+            '\$${p.price}',
+            style: TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 8),
           ElevatedButton(
             onPressed: () {
               setState(() {
@@ -262,7 +291,10 @@ class _MyShopOnlineState extends State<MyShopOnline> {
           myOptionalInDrawer(
             Icons.production_quantity_limits,
             'All Products',
-            () {},
+            () {
+              getProductsByCategory('');
+              Navigator.pop(context);
+            },
           ),
           myOptionalInDrawer(
             Icons.home_outlined,

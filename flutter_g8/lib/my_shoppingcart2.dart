@@ -179,11 +179,11 @@ class _MyShoppingCart2State extends State<MyShoppingCart2> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Name: ${it.title}",
+                      "${it.title}",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    Text("Price: \$${it.price.toStringAsFixed(2)}"),
+                    Text("\$${it.price.toStringAsFixed(2)}"),
                   ],
                 ),
               ),
