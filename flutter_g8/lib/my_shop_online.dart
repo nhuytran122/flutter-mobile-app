@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_g8/entity/product2.dart';
 import 'package:flutter_g8/entity/shoppingcart2.dart';
 import 'package:flutter_g8/my_list_prd_category.dart';
+import 'package:flutter_g8/my_profile.dart';
 import 'package:flutter_g8/utils/api_service.dart';
 
 class MyShopOnline extends StatefulWidget {
@@ -14,7 +15,6 @@ class MyShopOnline extends StatefulWidget {
 class _MyShopOnlineState extends State<MyShopOnline> {
   late Future<List<Product2>> lsProduct2;
   List<Product2> allProducts = [];
-  List<Product2> listProducts = [];
   List<String> listCategories = [];
   int currentPage = 0;
   String selectedCategory = '';
@@ -29,13 +29,6 @@ class _MyShopOnlineState extends State<MyShopOnline> {
     return products.map((product) => product.category).toSet().toList();
   }
 
-  void getProductsByCategory(String category) {
-    setState(() {
-      selectedCategory = category;
-      listProducts = Product2.filterByCategory(allProducts, selectedCategory);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,13 +37,12 @@ class _MyShopOnlineState extends State<MyShopOnline> {
       body: Column(
         children: [
           Expanded(
-            child: FutureBuilder<List<Product2>>(
+            child: FutureBuilder(
               future: lsProduct2,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
-                }
-                {
+                } else {
                   allProducts = snapshot.data!;
                   listCategories = getCategories(allProducts);
                   return MyPageView();
@@ -61,13 +53,19 @@ class _MyShopOnlineState extends State<MyShopOnline> {
           myBuildDotIndicator(),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          print("Floating Action Button Pressed");
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.blue,
-      ),
+      floatingActionButton: MyFloatingButton(),
+    );
+  }
+
+  FloatingActionButton MyFloatingButton() {
+    return FloatingActionButton.extended(
+      onPressed: () {
+        print("Pressed");
+      },
+      icon: Icon(Icons.message),
+      label: Text('Message'),
+      foregroundColor: Colors.white,
+      backgroundColor: Colors.blue,
     );
   }
 
@@ -94,7 +92,6 @@ class _MyShopOnlineState extends State<MyShopOnline> {
           padding: EdgeInsets.all(8.0),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            childAspectRatio: 1.0,
           ),
           itemCount: listCategories.length,
           itemBuilder: (context, index) {
@@ -108,18 +105,6 @@ class _MyShopOnlineState extends State<MyShopOnline> {
                     ),
                   ),
                 );
-                // Navigator.pushNamed(
-                //   context,
-                //   "/listproductsflcate",
-                //   arguments: {
-                //     'category': selectedCategory,
-                //     'allProducts': allProducts,
-                //   },
-                // ).then((value) {
-                //   if (value == true) {
-                //     setState(() {});
-                //   }
-                // });
               },
               child: buildCategoryCard(listCategories[index]),
             );
@@ -279,27 +264,55 @@ class _MyShopOnlineState extends State<MyShopOnline> {
             decoration: BoxDecoration(
               color: Colors.blue,
             ),
-            child: Text(
-              'SHOPPING',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 40,
+                  backgroundImage: AssetImage('assets/images/my_avt.jpg'),
+                ),
+                SizedBox(
+                  width: 20,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Nhu Y',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      '21t1020105@husc.edu.vn',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
           myOptionalInDrawer(
             Icons.production_quantity_limits,
             'All Products',
             () {
-              getProductsByCategory('');
+              allProducts;
               Navigator.pop(context);
             },
           ),
           myOptionalInDrawer(
             Icons.home_outlined,
             'My Profile',
-            () {},
+            () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => MyProfilePage(),
+              ));
+            },
           ),
           Divider(),
           myOptionalInDrawer(Icons.contact_emergency, 'Contact', () {}),

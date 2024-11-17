@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_g8/entity/product2.dart';
 import 'package:flutter_g8/entity/shoppingcart2.dart';
-import 'package:flutter_g8/my_shop_online.dart';
 
 class MyListPrdCategory extends StatefulWidget {
   final String category;
@@ -16,7 +15,8 @@ class MyListPrdCategory extends StatefulWidget {
 class _MyListPrdCategoryState extends State<MyListPrdCategory> {
   @override
   Widget build(BuildContext context) {
-    List<Product2> products = getProductsByCategory(widget.category);
+    List<Product2> products =
+        Product2.filterByCategory(widget.allProducts, widget.category);
 
     return Scaffold(
       appBar: myAppBar(context),
@@ -38,12 +38,6 @@ class _MyListPrdCategoryState extends State<MyListPrdCategory> {
     );
   }
 
-  // Lọc sản phẩm theo danh mục
-  List<Product2> getProductsByCategory(String category) {
-    return Product2.filterByCategory(widget.allProducts, category);
-  }
-
-  // AppBar
   AppBar myAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.blue,
@@ -92,7 +86,6 @@ class _MyListPrdCategoryState extends State<MyListPrdCategory> {
     );
   }
 
-  // Drawer
   Widget myDrawer(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width * 2 / 3,
@@ -142,7 +135,6 @@ class _MyListPrdCategoryState extends State<MyListPrdCategory> {
     );
   }
 
-  // Icon Cart (notification)
   Positioned myIconCart() {
     return Positioned(
       right: 5,
@@ -168,7 +160,6 @@ class _MyListPrdCategoryState extends State<MyListPrdCategory> {
     );
   }
 
-  // Xây dựng card sản phẩm
   Widget buildProductCard(Product2 p) {
     return Card(
       child: Column(
