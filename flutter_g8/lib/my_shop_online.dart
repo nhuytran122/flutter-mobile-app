@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_g8/entity/product2.dart';
 import 'package:flutter_g8/entity/shoppingcart2.dart';
+import 'package:flutter_g8/my_detail_product.dart';
 import 'package:flutter_g8/my_list_prd_category.dart';
 import 'package:flutter_g8/my_profile.dart';
 import 'package:flutter_g8/utils/api_service.dart';
@@ -85,7 +86,19 @@ class _MyShopOnlineState extends State<MyShopOnline> {
           ),
           itemCount: allProducts.length,
           itemBuilder: (context, index) {
-            return buildProductCard(allProducts[index]);
+            return GestureDetector(
+              onTap: () {
+                // Mở trang chi tiết sản phẩm khi nhấn vào
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ProductDetailPage(product: allProducts[index]),
+                  ),
+                );
+              },
+              child: buildProductCard(allProducts[index]),
+            );
           },
         ),
         GridView.builder(
@@ -217,14 +230,6 @@ class _MyShopOnlineState extends State<MyShopOnline> {
             shoppingCart2.items.length == 0 ? SizedBox.shrink() : myIconCart(),
           ],
         ),
-        IconButton(
-          onPressed: () => null,
-          icon: Icon(Icons.notifications, color: Colors.white),
-        ),
-        IconButton(
-          onPressed: () => null,
-          icon: Icon(Icons.search, color: Colors.amber),
-        ),
       ],
     );
   }
@@ -280,7 +285,7 @@ class _MyShopOnlineState extends State<MyShopOnline> {
                     Text(
                       'Nhu Y',
                       style: TextStyle(
-                        color: Colors.black,
+                        color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -288,7 +293,7 @@ class _MyShopOnlineState extends State<MyShopOnline> {
                     Text(
                       '21t1020105@husc.edu.vn',
                       style: TextStyle(
-                        color: Colors.black,
+                        color: Colors.white,
                         fontSize: 12,
                       ),
                     ),

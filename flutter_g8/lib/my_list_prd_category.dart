@@ -20,7 +20,6 @@ class _MyListPrdCategoryState extends State<MyListPrdCategory> {
 
     return Scaffold(
       appBar: myAppBar(context),
-      drawer: myDrawer(context),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: GridView.builder(
@@ -83,55 +82,6 @@ class _MyListPrdCategoryState extends State<MyListPrdCategory> {
           icon: Icon(Icons.search, color: Colors.amber),
         ),
       ],
-    );
-  }
-
-  Widget myDrawer(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width * 2 / 3,
-      decoration: BoxDecoration(color: Colors.white),
-      child: ListView(
-        children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.blue,
-            ),
-            child: Text(
-              'SHOPPING',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          myOptionalInDrawer(
-            Icons.production_quantity_limits,
-            'All Products',
-            () {
-              Navigator.pop(context);
-            },
-          ),
-          myOptionalInDrawer(
-            Icons.home_outlined,
-            'My Profile',
-            () {},
-          ),
-          Divider(),
-          myOptionalInDrawer(Icons.contact_emergency, 'Contact', () {}),
-          myOptionalInDrawer(Icons.settings_outlined, 'Setting', () {}),
-          myOptionalInDrawer(Icons.help_outline, 'Help', () {}),
-        ],
-      ),
-    );
-  }
-
-  ListTile myOptionalInDrawer(
-      IconData iconData, String label, VoidCallback onTap) {
-    return ListTile(
-      leading: Icon(iconData),
-      title: Text(label),
-      onTap: onTap,
     );
   }
 
