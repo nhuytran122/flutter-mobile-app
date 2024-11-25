@@ -80,7 +80,7 @@ class _MyShopOnlineState extends State<MyShopOnline> {
       children: [
         GridView.builder(
           padding: const EdgeInsets.all(8.0),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
             childAspectRatio: 0.7,
           ),
@@ -88,14 +88,15 @@ class _MyShopOnlineState extends State<MyShopOnline> {
           itemBuilder: (context, index) {
             return GestureDetector(
               onTap: () {
-                // Mở trang chi tiết sản phẩm khi nhấn vào
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
                         ProductDetailPage(product: allProducts[index]),
                   ),
-                );
+                ).then((value) {
+                  setState(() {});
+                });
               },
               child: buildProductCard(allProducts[index]),
             );
@@ -110,14 +111,19 @@ class _MyShopOnlineState extends State<MyShopOnline> {
           itemBuilder: (context, index) {
             return GestureDetector(
               onTap: () {
-                Navigator.of(context).push(
+                Navigator.of(context)
+                    .push(
                   MaterialPageRoute(
                     builder: (context) => MyListPrdCategory(
                       category: listCategories[index],
                       allProducts: allProducts,
                     ),
                   ),
-                );
+                )
+                    .then((value) {
+                  setState(() {});
+                });
+                ;
               },
               child: buildCategoryCard(listCategories[index]),
             );
@@ -314,9 +320,7 @@ class _MyShopOnlineState extends State<MyShopOnline> {
             Icons.home_outlined,
             'My Profile',
             () {
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => MyProfilePage(),
-              ));
+              Navigator.pushNamed(context, "/profile");
             },
           ),
           Divider(),
