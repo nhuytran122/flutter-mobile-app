@@ -4,6 +4,7 @@ import 'package:flutter_g8/my_homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_g8/my_idol.dart';
 import 'package:flutter_g8/my_list_prd_category.dart';
+import 'package:flutter_g8/my_login_page.dart';
 import 'package:flutter_g8/my_place.dart';
 import 'package:flutter_g8/my_productlist.dart';
 import 'package:flutter_g8/my_profile.dart';
@@ -36,8 +37,9 @@ class MyApp extends StatelessWidget {
         "/profile": (context) => MyProfilePage(),
       },
       // home: MyShoppingCart(),
-      initialRoute: "/myshoponline",
-      home: MyShopOnline(),
+      // initialRoute: "/myshoponline",
+      // home: MyShopOnline(),
+      home: LoginPage(),
       debugShowCheckedModeBanner: false,
     );
   }
