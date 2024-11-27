@@ -37,9 +37,9 @@ class MyApp extends StatelessWidget {
         "/profile": (context) => MyProfilePage(),
       },
       // home: MyShoppingCart(),
-      // initialRoute: "/myshoponline",
-      // home: MyShopOnline(),
-      home: LoginPage(),
+      initialRoute: "/myshoponline",
+      home: MyShopOnline(),
+      // home: LoginPage(),
       debugShowCheckedModeBanner: false,
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_g8/entity/product2.dart';
 import 'package:flutter_g8/entity/shoppingcart2.dart';
+import 'package:flutter_g8/my_detail_product.dart';
 
 class MyListPrdCategory extends StatefulWidget {
   final String category;
@@ -30,7 +31,20 @@ class _MyListPrdCategoryState extends State<MyListPrdCategory> {
           ),
           itemCount: products.length,
           itemBuilder: (context, index) {
-            return buildProductCard(products[index]);
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ProductDetailPage(product: products[index]),
+                  ),
+                ).then((value) {
+                  setState(() {});
+                });
+              },
+              child: buildProductCard(products[index]),
+            );
           },
         ),
       ),
@@ -72,14 +86,6 @@ class _MyListPrdCategoryState extends State<MyListPrdCategory> {
             ),
             shoppingCart2.items.length == 0 ? SizedBox.shrink() : myIconCart(),
           ],
-        ),
-        IconButton(
-          onPressed: () => null,
-          icon: Icon(Icons.notifications, color: Colors.white),
-        ),
-        IconButton(
-          onPressed: () => null,
-          icon: Icon(Icons.search, color: Colors.amber),
         ),
       ],
     );

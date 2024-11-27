@@ -26,7 +26,7 @@ class _MyShopOnlineState extends State<MyShopOnline> {
     lsProduct2 = ApiService.getAllProduct();
   }
 
-  List<String> getCategories(List<Product2> products) {
+  List<String> getListCategories(List<Product2> products) {
     return products.map((product) => product.category).toSet().toList();
   }
 
@@ -45,7 +45,7 @@ class _MyShopOnlineState extends State<MyShopOnline> {
                   return const Center(child: CircularProgressIndicator());
                 } else {
                   allProducts = snapshot.data!;
-                  listCategories = getCategories(allProducts);
+                  listCategories = getListCategories(allProducts);
                   return MyPageView();
                 }
               },
@@ -307,14 +307,6 @@ class _MyShopOnlineState extends State<MyShopOnline> {
                 ),
               ],
             ),
-          ),
-          myOptionalInDrawer(
-            Icons.production_quantity_limits,
-            'All Products',
-            () {
-              allProducts;
-              Navigator.pop(context);
-            },
           ),
           myOptionalInDrawer(
             Icons.home_outlined,

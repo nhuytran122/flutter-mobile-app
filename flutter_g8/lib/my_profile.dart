@@ -51,14 +51,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
             shoppingCart2.items.isEmpty ? SizedBox.shrink() : myIconCart(),
           ],
         ),
-        IconButton(
-          onPressed: () => null,
-          icon: Icon(Icons.notifications, color: Colors.white),
-        ),
-        IconButton(
-          onPressed: () => null,
-          icon: Icon(Icons.search, color: Colors.amber),
-        ),
       ],
     );
   }
