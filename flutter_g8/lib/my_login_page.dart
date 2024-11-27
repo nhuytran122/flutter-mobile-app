@@ -58,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
                 true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
+                    return 'Please enter your password';
                   }
                   if (value.length < 6) {
                     return 'Password must be at least 6 characters';
@@ -109,11 +109,6 @@ class _LoginPageState extends State<LoginPage> {
                       // In ra giá trị của email và password từ controller
                       print("Email: ${emailController.text}");
                       print("Password: ${passwordController.text}");
-                    } else {
-                      // Nếu có lỗi
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Please fix the errors')),
-                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -144,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Don’t have an account? "),
+                  Text("Don't have an account? "),
                   GestureDetector(
                     onTap: () {},
                     child: Text(
