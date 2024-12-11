@@ -12,6 +12,7 @@ import 'package:flutter_g8/my_shop.dart';
 import 'package:flutter_g8/my_shop_online.dart';
 import 'package:flutter_g8/my_shoppingcart.dart';
 import 'package:flutter_g8/my_shoppingcart2.dart';
+import 'package:flutter_g8/tmp.dart';
 
 void main() {
   runApp(MyApp());
@@ -37,9 +38,10 @@ class MyApp extends StatelessWidget {
         "/profile": (context) => MyProfilePage(),
       },
       // home: MyShoppingCart(),
-      initialRoute: "/myshoponline",
-      home: MyShopOnline(),
-      // home: LoginPage(),
+      // initialRoute: "/myshoponline",
+      // home: MyShopOnline(),
+      home: LoginPage(),
+      // home: NewsHomePage(),
       debugShowCheckedModeBanner: false,
     );
   }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -7,10 +9,44 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final formkey = GlobalKey<FormState>();
+  bool _rememberMe = false;
 
   // Tạo controller cho email và password
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
+  Future<void> _login() async {
+    final url = Uri.parse('https://dummyjson.com/auth/login');
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'username': emailController.text,
+        'password': passwordController.text,
+        'expiresInMins': 30
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print(data); // In dữ liệu trả về từ API
+
+      // Kiểm tra nếu có token hoặc thông tin cần thiết khác
+      if (data.containsKey('accessToken')) {
+        // Thành công
+        Navigator.pushNamed(context, "/myshoponline");
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login failed!')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login failed!')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +109,14 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   Row(
                     children: [
-                      Checkbox(value: false, onChanged: (value) {}),
+                      Checkbox(
+                        value: _rememberMe,
+                        onChanged: (value) {
+                          setState(() {
+                            _rememberMe = value!;
+                          });
+                        },
+                      ),
                       Text(
                         "Remember me",
                         style: TextStyle(
@@ -101,14 +144,15 @@ class _LoginPageState extends State<LoginPage> {
                 child: ElevatedButton(
                   onPressed: () {
                     if (formkey.currentState!.validate()) {
-                      // Nếu tất cả các trường hợp lệ
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        // SnackBar(content: Text('Login Successful!')),
-                        SnackBar(content: Text('Processing...')),
-                      );
+                      // // Nếu tất cả các trường hợp hợp lệ
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   // SnackBar(content: Text('Login Successful!')),
+                      //   SnackBar(content: Text('Processing...')),
+                      // );
                       // In ra giá trị của email và password từ controller
-                      print("Email: ${emailController.text}");
-                      print("Password: ${passwordController.text}");
+                      // print("Email: ${emailController.text}");
+                      // print("Password: ${passwordController.text}");
+                      _login();
                     }
                   },
                   style: ElevatedButton.styleFrom(
