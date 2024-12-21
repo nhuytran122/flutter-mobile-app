@@ -39,8 +39,8 @@ class MyApp extends StatelessWidget {
       },
       // home: MyShoppingCart(),
       // initialRoute: "/myshoponline",
-      // home: MyShopOnline(),
-      home: LoginPage(),
+      home: MyShopOnline(),
+      // home: LoginPage(),
       // home: NewsHomePage(),
       debugShowCheckedModeBanner: false,
     );
