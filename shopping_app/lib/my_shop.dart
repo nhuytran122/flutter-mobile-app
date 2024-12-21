@@ -3,16 +3,19 @@ import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/entity/constants.dart';
 import 'package:shopping_app/entity/my_product.dart';
 import 'package:shopping_app/entity/product.dart';
+import 'package:shopping_app/my_profile.dart';
 import 'package:shopping_app/utils/api_service.dart';
 
-class MyShopOnline extends StatefulWidget {
-  const MyShopOnline({super.key});
+class MyShop extends StatefulWidget {
+  final Map<String, dynamic> userData;
+
+  const MyShop({Key? key, required this.userData}) : super(key: key);
 
   @override
-  State<MyShopOnline> createState() => _MyShopOnlineState();
+  State<MyShop> createState() => _MyShopState();
 }
 
-class _MyShopOnlineState extends State<MyShopOnline> {
+class _MyShopState extends State<MyShop> {
   late List<Product> allProducts = [];
   List<Product> filteredProducts = [];
   List<String> listCategories = [];
@@ -27,7 +30,7 @@ class _MyShopOnlineState extends State<MyShopOnline> {
   @override
   void initState() {
     super.initState();
-    lsProduct = ApiService.getAllProduct(); // Lấy tất cả sản phẩm
+    lsProduct = ApiService.getAllProduct();
   }
 
   List<String> getListCategories(List<Product> products) {
@@ -57,15 +60,6 @@ class _MyShopOnlineState extends State<MyShopOnline> {
 
       noResultsFound = filteredProducts.isEmpty &&
           (searchQuery.isNotEmpty || selectedTags.isNotEmpty);
-    });
-  }
-
-  void searchProduct(String query) {
-    setState(() {
-      filteredProducts = allProducts.where((product) {
-        return product.title.toLowerCase().contains(query.toLowerCase());
-      }).toList();
-      noResultsFound = filteredProducts.isEmpty && query.isNotEmpty;
     });
   }
 
@@ -163,7 +157,7 @@ class _MyShopOnlineState extends State<MyShopOnline> {
                 selectedColor: Colors.blue.shade100,
                 backgroundColor: Colors.grey.shade200,
                 labelStyle: TextStyle(
-                  color: isSelected ? Colors.blue : Colors.black,
+                  color: isSelected ? AppColors.primary : Colors.black,
                 ),
               ),
             );
@@ -351,44 +345,77 @@ class _MyShopOnlineState extends State<MyShopOnline> {
       width: MediaQuery.of(context).size.width * 2 / 3,
       decoration: const BoxDecoration(color: Colors.white),
       child: ListView(
-        children: const [
+        children: [
           DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.blue,
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
             ),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 CircleAvatar(
-                  radius: 40,
-                  backgroundImage: AssetImage('assets/images/my_avt.jpg'),
+                  radius: 50,
+                  backgroundImage: NetworkImage(
+                    widget.userData['image'] ??
+                        'https://via.placeholder.com/150',
+                  ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 20,
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Nhu Y',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${widget.userData["firstName"] ?? ''} ${widget.userData["lastName"] ?? ''}'
+                                .trim()
+                                .isEmpty
+                            ? 'Guest'
+                            : '${widget.userData["firstName"] ?? ''} ${widget.userData["lastName"] ?? ''}'
+                                .trim(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    Text(
-                      '21t1020105@husc.edu.vn',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
+                      const SizedBox(height: 8),
+                      Text(
+                        widget.userData['email'] ?? '',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
+          myOptionalInDrawer(
+            Icons.home_outlined,
+            'My Profile',
+            () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      MyProfilePage(userData: widget.userData),
+                ),
+              );
+            },
+          ),
+          Divider(),
+          myOptionalInDrawer(Icons.contact_emergency, 'Contact', () {}),
+          myOptionalInDrawer(Icons.settings_outlined, 'Setting', () {}),
+          myOptionalInDrawer(Icons.help_outline, 'Help', () {}),
         ],
       ),
     );
@@ -428,6 +455,15 @@ class _MyShopOnlineState extends State<MyShopOnline> {
           style: TextStyle(fontSize: 16, color: Colors.red),
         ),
       ),
+    );
+  }
+
+  ListTile myOptionalInDrawer(
+      IconData iconData, String label, VoidCallback onTap) {
+    return ListTile(
+      leading: Icon(iconData),
+      title: Text(label),
+      onTap: onTap,
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:shopping_app/entity/appColor.dart';
+import 'package:shopping_app/my_shop.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -9,7 +11,6 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final formkey = GlobalKey<FormState>();
-  bool _rememberMe = false;
 
   // Tạo controller cho email và password
   final emailController = TextEditingController();
@@ -34,8 +35,22 @@ class _LoginPageState extends State<LoginPage> {
 
       // Kiểm tra nếu có token hoặc thông tin cần thiết khác
       if (data.containsKey('accessToken')) {
-        // Thành công
-        Navigator.pushNamed(context, "/myshop");
+        // Lấy thông tin người dùng từ API
+        final userData = await _getUserData(data['accessToken']);
+
+        if (userData != null) {
+          // Thành công, chuyển sang trang MyShop với dữ liệu người dùng
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MyShop(userData: userData),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to load user data')),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login failed!')),
@@ -45,6 +60,25 @@ class _LoginPageState extends State<LoginPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login failed!')),
       );
+    }
+  }
+
+  // Hàm để lấy thông tin người dùng
+  Future<Map<String, dynamic>?> _getUserData(String accessToken) async {
+    final url = Uri.parse('https://dummyjson.com/auth/me');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body); // Trả về thông tin người dùng
+    } else {
+      return null; // Không lấy được thông tin người dùng
     }
   }
 
@@ -114,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
+                    backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
