@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_app/login_page.dart';
+import 'package:shopping_app/my_cart.dart';
 import 'package:shopping_app/my_shop.dart';
 
 void main() {
@@ -13,12 +14,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       routes: {
-        // "/shoppingcart2": (context) => MyShoppingCart2(),
+        MyShoppingCart.routeName: (context) => MyShoppingCart(),
       },
       theme: ThemeData(
         fontFamily: "Muli",
       ),
-      // initialRoute: "/myshoponline",
+      initialRoute: LoginPage.routeName,
       home: LoginPage(),
       debugShowCheckedModeBanner: false,
     );

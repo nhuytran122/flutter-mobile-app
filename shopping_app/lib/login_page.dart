@@ -3,8 +3,10 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/my_shop.dart';
+import 'package:shopping_app/utils/api_service.dart';
 
 class LoginPage extends StatefulWidget {
+  static String routeName = "/login";
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
@@ -17,68 +19,30 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
 
   Future<void> _login() async {
-    final url = Uri.parse('https://dummyjson.com/auth/login');
+    final username = emailController.text;
+    final password = passwordController.text;
 
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'username': emailController.text,
-        'password': passwordController.text,
-        'expiresInMins': 30
-      }),
-    );
+    final data = await ApiService.login(username, password);
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      print(data); // In dữ liệu trả về từ API
+    if (data != null && data.containsKey('accessToken')) {
+      final userData = await ApiService.getUserData(data['accessToken']);
 
-      // Kiểm tra nếu có token hoặc thông tin cần thiết khác
-      if (data.containsKey('accessToken')) {
-        // Lấy thông tin người dùng từ API
-        final userData = await _getUserData(data['accessToken']);
-
-        if (userData != null) {
-          // Thành công, chuyển sang trang MyShop với dữ liệu người dùng
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MyShop(userData: userData),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to load user data')),
-          );
-        }
+      if (userData != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MyShop(userData: userData),
+          ),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login failed!')),
+          const SnackBar(content: Text('Failed to load user data')),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login failed!')),
       );
-    }
-  }
-
-  // Hàm để lấy thông tin người dùng
-  Future<Map<String, dynamic>?> _getUserData(String accessToken) async {
-    final url = Uri.parse('https://dummyjson.com/auth/me');
-
-    final response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body); // Trả về thông tin người dùng
-    } else {
-      return null; // Không lấy được thông tin người dùng
     }
   }
 

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_app/entity/appColor.dart';
-import 'package:shopping_app/entity/constants.dart';
-import 'package:shopping_app/entity/my_product.dart';
 import 'package:shopping_app/entity/product.dart';
+import 'package:shopping_app/entity/shoppingCart.dart';
+import 'package:shopping_app/entity/user.dart';
+import 'package:shopping_app/my_cart.dart';
 import 'package:shopping_app/my_profile.dart';
 import 'package:shopping_app/utils/api_service.dart';
 
 class MyShop extends StatefulWidget {
-  final Map<String, dynamic> userData;
+  final User userData;
 
   const MyShop({Key? key, required this.userData}) : super(key: key);
 
@@ -18,8 +19,6 @@ class MyShop extends StatefulWidget {
 class _MyShopState extends State<MyShop> {
   late List<Product> allProducts = [];
   List<Product> filteredProducts = [];
-  List<String> listCategories = [];
-  List<String> listTags = [];
   bool noResultsFound = false;
   List<String> selectedTags = [];
   List<Product> discountedProducts = [];
@@ -45,6 +44,18 @@ class _MyShopState extends State<MyShop> {
       }
     }
     return tags.toList();
+  }
+
+  List<Product> getTopSaleProducts(List<Product> products) {
+    discountedProducts = allProducts
+        .where((product) => product.discountPercentage != null)
+        .toList();
+
+    discountedProducts
+        .sort((a, b) => b.discountPercentage.compareTo(a.discountPercentage));
+
+    discountedProducts = discountedProducts.take(10).toList();
+    return discountedProducts;
   }
 
   void filterProducts() {
@@ -82,17 +93,15 @@ class _MyShopState extends State<MyShop> {
             if (filteredProducts.isEmpty && !noResultsFound) {
               filteredProducts = allProducts;
             }
-            discountedProducts =
-                allProducts.where((product) => product.price < 30).toList();
-            listCategories = getListCategories(allProducts);
-            listTags = getListTags(allProducts);
+            List<String> listCategories = getListCategories(allProducts);
+            List<String> listTags = getListTags(allProducts);
 
             return ListView(
               children: [
-                buildCategories(),
-                buildTags(),
+                buildCategories(listCategories),
+                buildTags(listTags),
                 buildTitle("Top Products Discounted"),
-                buildDiscountedProducts(),
+                buildTopSales(getTopSaleProducts(allProducts)),
                 buildTitle("All Products"),
                 noResultsFound
                     ? buildNoResultsMessage()
@@ -105,7 +114,7 @@ class _MyShopState extends State<MyShop> {
     );
   }
 
-  Widget buildCategories() {
+  Widget buildCategories(List<String> listCategories) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Container(
@@ -130,7 +139,7 @@ class _MyShopState extends State<MyShop> {
     );
   }
 
-  Widget buildTags() {
+  Widget buildTags(List<String> listTags) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: SingleChildScrollView(
@@ -167,13 +176,13 @@ class _MyShopState extends State<MyShop> {
     );
   }
 
-  Widget buildDiscountedProducts() {
+  Widget buildTopSales(List<Product> lstTopSales) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: discountedProducts.map((product) {
+          children: lstTopSales.map((product) {
             return Padding(
               padding: const EdgeInsets.all(2.0),
               child: Container(
@@ -226,11 +235,36 @@ class _MyShopState extends State<MyShop> {
     return Card(
       child: Column(
         children: [
-          Image.network(
-            p.thumbnail,
-            height: 80,
-            width: 80,
-            fit: BoxFit.cover,
+          Stack(
+            children: [
+              Image.network(
+                p.thumbnail,
+                height: 80,
+                width: 80,
+                fit: BoxFit.cover,
+              ),
+              if (p.discountPercentage != null && p.discountPercentage! > 0)
+                Positioned(
+                  top: 5,
+                  right: 0,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${p.discountPercentage!.toStringAsFixed(0)}%',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 8),
           Text(
@@ -249,7 +283,9 @@ class _MyShopState extends State<MyShop> {
           const SizedBox(height: 8),
           ElevatedButton(
             onPressed: () {
-              print("Added ${p.title} to cart");
+              setState(() {
+                cart.add(p);
+              });
             },
             child: const Text("Add to cart"),
             style: ElevatedButton.styleFrom(
@@ -322,7 +358,8 @@ class _MyShopState extends State<MyShop> {
           children: [
             IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, "/shoppingcart2").then((value) {
+                Navigator.pushNamed(context, MyShoppingCart.routeName)
+                    .then((value) {
                   if (value == true) {
                     setState(() {}); // Cập nhật khi quay về
                   }
@@ -333,7 +370,8 @@ class _MyShopState extends State<MyShop> {
                 color: Colors.black,
               ),
             ),
-            2 == 0 ? const SizedBox.shrink() : myIconCart(),
+            cart.items.length == 0 ? SizedBox.shrink() : myIconCart(),
+            2 == 0 ? SizedBox.shrink() : myIconCart(),
           ],
         ),
       ],
@@ -356,8 +394,7 @@ class _MyShopState extends State<MyShop> {
                 CircleAvatar(
                   radius: 50,
                   backgroundImage: NetworkImage(
-                    widget.userData['image'] ??
-                        'https://via.placeholder.com/150',
+                    widget.userData.image ?? 'https://via.placeholder.com/150',
                   ),
                 ),
                 const SizedBox(
@@ -369,11 +406,11 @@ class _MyShopState extends State<MyShop> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        '${widget.userData["firstName"] ?? ''} ${widget.userData["lastName"] ?? ''}'
+                        '${widget.userData.firstName ?? ''} ${widget.userData.lastName ?? ''}'
                                 .trim()
                                 .isEmpty
                             ? 'Guest'
-                            : '${widget.userData["firstName"] ?? ''} ${widget.userData["lastName"] ?? ''}'
+                            : '${widget.userData.firstName ?? ''} ${widget.userData.lastName ?? ''}'
                                 .trim(),
                         style: const TextStyle(
                           color: Colors.white,
@@ -385,7 +422,7 @@ class _MyShopState extends State<MyShop> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        widget.userData['email'] ?? '',
+                        widget.userData.email ?? '',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -432,9 +469,9 @@ class _MyShopState extends State<MyShop> {
           color: Colors.red,
           shape: BoxShape.circle,
         ),
-        child: const Center(
+        child: Center(
           child: Text(
-            '2', // Placeholder for shopping cart item count
+            '${cart.items.length}',
             style: TextStyle(
               color: Colors.white,
               fontSize: 10,

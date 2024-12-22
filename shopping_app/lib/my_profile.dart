@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_app/entity/appColor.dart';
+import 'package:shopping_app/entity/user.dart';
 
 class MyProfilePage extends StatefulWidget {
-  final Map<String, dynamic> userData;
+  final User userData;
 
   const MyProfilePage({Key? key, required this.userData}) : super(key: key);
 
@@ -49,17 +50,17 @@ class _MyProfilePageState extends State<MyProfilePage> {
           CircleAvatar(
             radius: 50,
             backgroundImage: NetworkImage(
-              widget.userData['image'] ?? 'https://via.placeholder.com/150',
+              widget.userData.image ?? 'https://via.placeholder.com/150',
             ),
             backgroundColor: Colors.grey[200],
           ),
           SizedBox(height: 16),
           Text(
-            '${widget.userData["firstName"]} ${widget.userData["lastName"]}'
+            '${widget.userData.firstName} ${widget.userData.lastName}'
                     .trim()
                     .isEmpty
                 ? 'Guest'
-                : '${widget.userData["firstName"]} ${widget.userData["lastName"]}'
+                : '${widget.userData.firstName} ${widget.userData.lastName}'
                     .trim(),
             style: TextStyle(
               fontSize: 24,
@@ -69,7 +70,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
           SizedBox(height: 8),
           // Email
           Text(
-            widget.userData['username'] ?? '',
+            widget.userData.username,
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey[700],
@@ -77,11 +78,21 @@ class _MyProfilePageState extends State<MyProfilePage> {
           ),
           SizedBox(height: 20),
           buildInforUser(
-              "Email", widget.userData['email']?.toString() ?? '', Icons.mail),
+              "Email", widget.userData.email?.toString() ?? '', Icons.mail),
           buildInforUser(
-              "Age", widget.userData['age']?.toString() ?? '', Icons.numbers),
+              "Age", widget.userData.age?.toString() ?? '', Icons.numbers),
+          buildInforUser("Gender", widget.userData.gender, Icons.person),
           buildInforUser(
-              "Phone", widget.userData['phone']?.toString() ?? '', Icons.phone),
+              "Phone", widget.userData.phone?.toString() ?? '', Icons.phone),
+          buildInforUser(
+              "Birth Date",
+              widget.userData.birthDate?.toString() ?? '',
+              Icons.calendar_today),
+          buildInforUser(
+            "Address",
+            "${widget.userData.address.address}, ${widget.userData.address.city}, ${widget.userData.address.state}",
+            Icons.location_on,
+          ),
         ],
       ),
     );
