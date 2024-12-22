@@ -1,19 +1,15 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:shopping_app/entity/category.dart';
 import 'package:shopping_app/entity/product.dart';
-import 'package:http/http.dart' as http;
 import 'package:shopping_app/entity/user.dart';
+import 'package:http/http.dart' as http;
 
 class ApiService {
-  static Future<List<Product>> getAllProduct() async {
+  static Future<List<Product>> getAllProducts() async {
     var dio = Dio();
-    var response = await dio.request(
-      'https://dummyjson.com/products',
-      options: Options(
-        method: 'GET',
-      ),
-    );
+    var response = await dio.get('https://dummyjson.com/products');
 
     if (response.statusCode == 200) {
       if (response.data is Map<String, dynamic>) {
@@ -23,7 +19,41 @@ class ApiService {
         throw Exception('Invalid response format');
       }
     } else {
-      print(response.statusMessage);
+      throw Exception(response.statusMessage);
+    }
+  }
+
+  static Future<Product?> getProductByID(int id) async {
+    var dio = Dio();
+    var response = await dio.get('https://dummyjson.com/products/$id');
+
+    if (response.statusCode == 200) {
+      return Product.fromJson(response.data);
+    } else {
+      return null;
+    }
+  }
+
+  static Future<List<Product>> getProductsByCategoryID(String id) async {
+    var dio = Dio();
+    var response = await dio.get('https://dummyjson.com/products/category/$id');
+
+    if (response.statusCode == 200) {
+      List<dynamic> rs = response.data['products'];
+      return rs.map((e) => Product.fromJson(e)).toList();
+    } else {
+      throw Exception(response.statusMessage);
+    }
+  }
+
+  static Future<List<Category>> getAllCategories() async {
+    var dio = Dio();
+    var response = await dio.get('https://dummyjson.com/products/categories');
+
+    if (response.statusCode == 200) {
+      List<dynamic> rs = response.data;
+      return rs.map((e) => Category.fromJson(e)).toList();
+    } else {
       throw Exception(response.statusMessage);
     }
   }

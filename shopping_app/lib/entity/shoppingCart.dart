@@ -45,6 +45,7 @@ class ShoppingCart {
         return;
       }
     }
+
     var itTmp = ItemInCart(
       p.id,
       p.title,
@@ -57,6 +58,7 @@ class ShoppingCart {
       p.availabilityStatus,
       p.minimumOrderQuantity,
       p.thumbnail,
+      quantity: quantity,
     );
     items.add(itTmp);
   }

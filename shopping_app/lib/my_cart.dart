@@ -58,16 +58,15 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
       direction: DismissDirection.endToStart, // Chỉ vuốt từ phải qua trái
       onDismissed: (direction) {
         setState(() {
-          // Giảm tổng giá trị khi item bị xóa
           cart.remove(it);
         });
       },
       background: Container(
-        color: Colors.red, // Màu nền khi vuốt
+        color: Colors.red,
         alignment: Alignment.centerRight,
         child: const Padding(
           padding: EdgeInsets.only(right: 20),
-          child: Icon(Icons.delete, color: Colors.white), // Biểu tượng xóa
+          child: Icon(Icons.delete, color: Colors.white),
         ),
       ),
       child: Card(
