@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shopping_app/components/cart_icon.dart';
 import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/entity/common_method.dart';
 import 'package:shopping_app/entity/product.dart';
@@ -29,7 +28,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   void initState() {
     super.initState();
-    fetchRelatedProducts(); // Fetch related products when the page loads
+    fetchRelatedProducts();
   }
 
   Future<void> fetchRelatedProducts() async {

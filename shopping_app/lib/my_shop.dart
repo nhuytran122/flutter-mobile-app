@@ -4,6 +4,7 @@ import 'package:shopping_app/entity/product.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
 import 'package:shopping_app/entity/user.dart';
 import 'package:shopping_app/my_cart.dart';
+import 'package:shopping_app/my_details_product.dart';
 import 'package:shopping_app/my_profile.dart';
 import 'package:shopping_app/utils/api_service.dart';
 
@@ -29,7 +30,7 @@ class _MyShopState extends State<MyShop> {
   @override
   void initState() {
     super.initState();
-    lsProduct = ApiService.getAllProduct();
+    lsProduct = ApiService.getAllProducts();
   }
 
   List<String> getListCategories(List<Product> products) {
@@ -232,69 +233,85 @@ class _MyShopState extends State<MyShop> {
   }
 
   Widget buildProductCard(Product p) {
-    return Card(
-      child: Column(
-        children: [
-          Stack(
-            children: [
-              Image.network(
-                p.thumbnail,
-                height: 80,
-                width: 80,
-                fit: BoxFit.cover,
-              ),
-              if (p.discountPercentage != null && p.discountPercentage! > 0)
-                Positioned(
-                  top: 5,
-                  right: 0,
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${p.discountPercentage!.toStringAsFixed(0)}%',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 10,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailPage(
+              product: p,
+            ),
+          ),
+        ).then((value) {
+          if (value == true) {
+            setState(() {});
+          }
+        });
+      },
+      child: Card(
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                Image.network(
+                  p.thumbnail,
+                  height: 80,
+                  width: 80,
+                  fit: BoxFit.cover,
+                ),
+                if (p.discountPercentage != null && p.discountPercentage! > 0)
+                  Positioned(
+                    top: 5,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '${p.discountPercentage!.toStringAsFixed(0)}%',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                        ),
                       ),
                     ),
                   ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            p.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '\$${p.price}',
-            style: const TextStyle(
-              color: Colors.red,
-              fontWeight: FontWeight.bold,
+              ],
             ),
-          ),
-          const SizedBox(height: 8),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                cart.add(p);
-              });
-            },
-            child: const Text("Add to cart"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
+            const SizedBox(height: 8),
+            Text(
+              p.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-          ),
-          const SizedBox(height: 8),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              '\$${p.price}',
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  cart.add(p);
+                });
+              },
+              child: const Text("Add to cart"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                foregroundColor: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
     );
   }
