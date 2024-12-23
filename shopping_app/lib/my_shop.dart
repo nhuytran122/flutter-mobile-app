@@ -239,7 +239,7 @@ class _MyShopState extends State<MyShop> {
           context,
           MaterialPageRoute(
             builder: (context) => ProductDetailPage(
-              product: p,
+              productId: p.id,
             ),
           ),
         ).then((value) {
@@ -305,7 +305,7 @@ class _MyShopState extends State<MyShop> {
               },
               child: const Text("Add to cart"),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
+                backgroundColor: AppColors.secondary,
                 foregroundColor: Colors.white,
               ),
             ),
