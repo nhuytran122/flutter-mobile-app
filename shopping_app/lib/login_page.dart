@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/my_shop.dart';

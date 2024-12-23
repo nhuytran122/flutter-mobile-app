@@ -10,7 +10,6 @@ class ItemInCart {
   String? brand;
   int weight;
   String availabilityStatus;
-  int minimumOrderQuantity;
   String thumbnail;
 
   late int quantity; // Số lượng sản phẩm trong giỏ
@@ -25,7 +24,6 @@ class ItemInCart {
     this.brand,
     this.weight,
     this.availabilityStatus,
-    this.minimumOrderQuantity,
     this.thumbnail, {
     this.quantity = 1, // Mặc định là 1 sản phẩm
   });
@@ -56,7 +54,6 @@ class ShoppingCart {
       p.brand,
       p.weight,
       p.availabilityStatus,
-      p.minimumOrderQuantity,
       p.thumbnail,
       quantity: quantity,
     );
@@ -81,6 +78,15 @@ class ShoppingCart {
 
   double getTotal() {
     return items.fold(0, (s, item) => s + item.quantity * item.price);
+  }
+
+  int getQuantityItemInCart(int productId) {
+    for (var item in items) {
+      if (item.id == productId) {
+        return item.quantity;
+      }
+    }
+    return 0;
   }
 }
 

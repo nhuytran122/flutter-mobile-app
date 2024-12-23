@@ -4,6 +4,7 @@ import 'package:shopping_app/entity/common_method.dart';
 import 'package:shopping_app/entity/constants.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
 import 'package:shopping_app/my_checkout.dart';
+import 'package:shopping_app/my_details_product.dart';
 
 class MyShoppingCart extends StatefulWidget {
   static String routeName = "/cart";
@@ -53,119 +54,145 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
   }
 
   Widget _buildShopSection(ItemInCart it) {
-    return Dismissible(
-      key: Key(it.id.toString()), // Đảm bảo mỗi item có key riêng biệt
-      direction: DismissDirection.endToStart, // Chỉ vuốt từ phải qua trái
-      onDismissed: (direction) {
-        setState(() {
-          cart.remove(it);
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailPage(
+              productId: it.id,
+            ),
+          ),
+        ).then((value) {
+          if (value == true) {
+            setState(() {});
+          }
         });
       },
-      background: Container(
-        color: Colors.red,
-        alignment: Alignment.centerRight,
-        child: const Padding(
-          padding: EdgeInsets.only(right: 20),
-          child: Icon(Icons.delete, color: Colors.white),
+      child: Dismissible(
+        key: Key(it.id.toString()), // Đảm bảo mỗi item có key riêng biệt
+        direction: DismissDirection.endToStart, // Chỉ vuốt từ phải qua trái
+        onDismissed: (direction) {
+          setState(() {
+            cart.remove(it);
+          });
+        },
+        background: Container(
+          color: Colors.red,
+          alignment: Alignment.centerRight,
+          child: const Padding(
+            padding: EdgeInsets.only(right: 20),
+            child: Icon(Icons.delete, color: Colors.white),
+          ),
         ),
-      ),
-      child: Card(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Container(
-                    height: 80,
-                    width: 80,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(it.thumbnail),
-                        fit: BoxFit.cover,
+        child: Card(
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Container(
+                      height: 80,
+                      width: 80,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(it.thumbnail),
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: BorderRadius.circular(4),
                       ),
-                      borderRadius: BorderRadius.circular(4),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          it.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Text(
-                              '\$${it.price.toStringAsFixed(0)}',
-                              style: const TextStyle(
-                                color: Color(0xFFEE4D2D),
-                                fontWeight: FontWeight.bold,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            it.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Text(
+                                '\$${it.price.toStringAsFixed(0)}',
+                                style: const TextStyle(
+                                  color: Color(0xFFEE4D2D),
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '\$${(CommonMethod.calculateOriginalPrice(it.price, it.discountPercentage)).toStringAsFixed(0)}',
-                              style: const TextStyle(
-                                decoration: TextDecoration.lineThrough,
-                                color: Colors.grey,
-                                fontSize: 12,
+                              const SizedBox(width: 4),
+                              Text(
+                                '\$${(CommonMethod.calculateOriginalPrice(it.price, it.discountPercentage)).toStringAsFixed(0)}',
+                                style: const TextStyle(
+                                  decoration: TextDecoration.lineThrough,
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
                               ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey[300]!),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                cart.addItemInCart(it, quantity: -1);
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              child: const Icon(Icons.remove, size: 16),
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey[300]!),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              cart.addItemInCart(it, quantity: -1);
-                            });
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            child: const Icon(Icons.remove, size: 16),
                           ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Text(
-                            '${it.quantity}',
-                            style: const TextStyle(fontSize: 14),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              '${it.quantity}',
+                              style: const TextStyle(fontSize: 14),
+                            ),
                           ),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              cart.addItemInCart(it, quantity: 1);
-                            });
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            child: const Icon(Icons.add, size: 16),
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                if (it.quantity < it.stock) {
+                                  cart.addItemInCart(it, quantity: 1);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                          'Cannot add more than available stock!'),
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                }
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              child: const Icon(Icons.add, size: 16),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

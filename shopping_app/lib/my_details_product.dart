@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/entity/common_method.dart';
 import 'package:shopping_app/entity/product.dart';
@@ -22,7 +20,7 @@ class ProductDetailPage extends StatefulWidget {
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
-  late int quantity;
+  int quantity = 1;
   Product? product;
   List<Product> relatedProducts = [];
 
@@ -38,7 +36,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       if (fetchedProduct != null) {
         setState(() {
           product = fetchedProduct;
-          quantity = product!.minimumOrderQuantity;
         });
         fetchRelatedProducts();
       }
@@ -61,6 +58,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     }
   }
 
+  @override
   @override
   Widget build(BuildContext context) {
     if (product == null) {
@@ -91,26 +89,25 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       fit: BoxFit.contain,
                     ),
                   ),
-                  if (product!.rating != null)
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.orange,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          '${product!.rating.toStringAsFixed(1)} ⭐',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '${product!.rating.toStringAsFixed(1)} ⭐',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
                         ),
                       ),
                     ),
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -156,12 +153,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           icon: const Icon(Icons.remove),
                           onPressed: () {
                             setState(() {
-                              if (quantity > product!.minimumOrderQuantity) {
+                              if (quantity > 1) {
                                 quantity--;
                               }
                             });
                           },
-                          visualDensity: VisualDensity.compact,
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -176,9 +172,23 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         IconButton(
                           icon: const Icon(Icons.add),
                           onPressed: () {
+                            final currentQuantityInCart =
+                                cart.getQuantityItemInCart(product!.id);
+                            final totalQuantityToAdd =
+                                currentQuantityInCart + quantity;
+
                             setState(() {
-                              if (quantity < product!.stock) {
+                              if (totalQuantityToAdd < product!.stock) {
                                 quantity++;
+                              } else {
+                                // Hiển thị thông báo nếu tổng số lượng vượt quá tồn kho
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Only ${product!.stock - currentQuantityInCart} more items are available in stock!',
+                                    ),
+                                  ),
+                                );
                               }
                             });
                           },
@@ -189,19 +199,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
-                      if (quantity >= product!.minimumOrderQuantity &&
-                          quantity <= product!.stock) {
-                        setState(() {
-                          cart.add(product!, quantity: quantity);
-                        });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '${product!.title} added to cart (x$quantity)',
-                            ),
-                          ),
-                        );
-                      }
+                      setState(() {
+                        cart.add(product!, quantity: quantity);
+                      });
                     },
                     icon: const Icon(Icons.shopping_cart),
                     label: const Text("Add to Cart"),
@@ -221,19 +221,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               buildDetailRow('Brand:', product!.brand ?? 'N/A'),
               buildDetailRow('Stock:', '${product!.stock} items'),
               buildDetailRow('Weight:', '${product!.weight} kg'),
-              buildDetailRow('Minimum Order Quantity:',
-                  '${product!.minimumOrderQuantity}'),
-              buildDetailRow('Warranty Information:',
-                  product!.warrantyInformation ?? 'N/A'),
-              buildDetailRow('Shipping Information:',
-                  product!.shippingInformation ?? 'N/A'),
+              buildDetailRow(
+                  'Warranty Information:', product!.warrantyInformation),
+              buildDetailRow(
+                  'Shipping Information:', product!.shippingInformation),
               buildDetailRow('Availability:', product!.availabilityStatus),
-              buildDetailRow('Return Policy:', product!.returnPolicy ?? 'N/A'),
+              buildDetailRow('Return Policy:', product!.returnPolicy),
               const Divider(height: 32),
-              const Text(
-                'Tags:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+              buildSubTitle("Tags: "),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -241,8 +236,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     product!.tags.map((tag) => Chip(label: Text(tag))).toList(),
               ),
               const Divider(height: 32),
-              const Text('More Images:',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              buildSubTitle("More Images:"),
               const SizedBox(height: 8),
               SizedBox(
                 height: 100,
@@ -262,14 +256,40 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 ),
               ),
               const Divider(height: 32),
-              const Text(
-                'Related Products:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              buildSubTitle("Reviews:"),
+              const SizedBox(height: 8),
+              Column(
+                children: product!.reviews
+                    .take(2)
+                    .map((review) => buildReviewCard(review))
+                    .toList(),
               ),
+              if (product!.reviews.length > 2)
+                Center(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              FullReviewPage(reviews: product!.reviews),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'See More Reviews',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              buildSubTitle("Related Products:"),
               const SizedBox(height: 8),
               relatedProducts.isNotEmpty
                   ? SizedBox(
-                      height: 250,
+                      height: 220,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: relatedProducts.length,
@@ -280,7 +300,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                 const EdgeInsets.symmetric(horizontal: 8.0),
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.pushReplacement(
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => ProductDetailPage(
@@ -305,6 +325,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
+  Widget buildSubTitle(String subTitle) {
+    return Text(
+      subTitle,
+      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    );
+  }
+
   Widget buildRelatedProductCard(Product p) {
     return GestureDetector(
       onTap: () {
@@ -321,69 +348,109 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           }
         });
       },
-      child: Card(
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                Image.network(
-                  p.thumbnail,
-                  height: 80,
-                  width: 80,
-                  fit: BoxFit.cover,
-                ),
-                if (p.discountPercentage != null && p.discountPercentage! > 0)
-                  Positioned(
-                    top: 5,
-                    right: 0,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        '${p.discountPercentage!.toStringAsFixed(0)}%',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 10,
+      child: Container(
+        width: 150,
+        child: Card(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Stack(
+                children: [
+                  Image.network(
+                    p.thumbnail,
+                    height: 80,
+                    width: 120,
+                    fit: BoxFit.cover,
+                  ),
+                  if (p.discountPercentage > 0)
+                    Positioned(
+                      top: 5,
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${p.discountPercentage.toStringAsFixed(0)}%',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
                         ),
                       ),
                     ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(
+                  p.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
                   ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              p.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '\$${p.price}',
-              style: const TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  cart.add(p);
-                });
-              },
-              child: const Text("Add to cart"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.secondary,
-                foregroundColor: Colors.white,
+              const SizedBox(height: 8),
+              Text(
+                '\$${p.price}',
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-          ],
+              const SizedBox(height: 8),
+              ElevatedButton.icon(
+                onPressed: () {
+                  final currentQuantityInCart =
+                      cart.getQuantityItemInCart(product!.id);
+
+                  int totalQuantityToAdd = currentQuantityInCart + quantity;
+
+                  if (totalQuantityToAdd > product!.stock) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Cannot add more than ${product!.stock} items of ${product!.title} to the cart!',
+                        ),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  } else {
+                    setState(() {
+                      cart.add(product!, quantity: quantity);
+                    });
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '${product!.title} added to cart (x$quantity)',
+                        ),
+                      ),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.shopping_cart),
+                label: const Text("Add to Cart"),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.all(20),
+                  backgroundColor: AppColors.secondary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
         ),
       ),
     );
@@ -398,9 +465,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         },
         icon: Icon(Icons.arrow_back, color: Colors.white, size: 30),
       ),
-      title: Text(
-        product!.title,
-        style: const TextStyle(color: Colors.white),
+      title: Center(
+        child: Text(
+          product!.title,
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
       actions: [
         Stack(
@@ -435,6 +504,34 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ),
           Text(value),
         ],
+      ),
+    );
+  }
+
+  Widget buildReviewCard(Review review) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              review.reviewerName,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                const Icon(Icons.star, color: Colors.orange, size: 14),
+                const SizedBox(width: 4),
+                Text(review.rating.toString()),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(review.comment),
+          ],
+        ),
       ),
     );
   }

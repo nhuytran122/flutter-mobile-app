@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shopping_app/delivery_page.dart';
 import 'package:shopping_app/login_page.dart';
 import 'package:shopping_app/my_cart.dart';
-import 'package:shopping_app/my_shop.dart';
+import 'package:shopping_app/my_checkout.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,6 +16,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       routes: {
         MyShoppingCart.routeName: (context) => MyShoppingCart(),
+        CheckOutScreen.routeName: (context) => CheckOutScreen(),
+        DeliveryProgressScreen.routeName: (context) => DeliveryProgressScreen(),
       },
       theme: ThemeData(
         fontFamily: "Muli",

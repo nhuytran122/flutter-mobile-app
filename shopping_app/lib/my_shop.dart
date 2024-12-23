@@ -248,69 +248,80 @@ class _MyShopState extends State<MyShop> {
           }
         });
       },
-      child: Card(
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                Image.network(
-                  p.thumbnail,
-                  height: 80,
-                  width: 80,
-                  fit: BoxFit.cover,
-                ),
-                if (p.discountPercentage != null && p.discountPercentage! > 0)
-                  Positioned(
-                    top: 5,
-                    right: 0,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        '${p.discountPercentage!.toStringAsFixed(0)}%',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 10,
+      child: Container(
+        width: 150,
+        child: Card(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Stack(
+                children: [
+                  Image.network(
+                    p.thumbnail,
+                    height: 80,
+                    width: 120,
+                    fit: BoxFit.cover,
+                  ),
+                  if (p.discountPercentage != null && p.discountPercentage > 0)
+                    Positioned(
+                      top: 5,
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${p.discountPercentage.toStringAsFixed(0)}%',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
                         ),
                       ),
                     ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(
+                  p.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
                   ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              p.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '\$${p.price}',
-              style: const TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  cart.add(p);
-                });
-              },
-              child: const Text("Add to cart"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.secondary,
-                foregroundColor: Colors.white,
+              const SizedBox(height: 8),
+              Text(
+                '\$${p.price}',
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-          ],
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    cart.add(p, quantity: 1);
+                  });
+                },
+                child: const Text("Add to cart"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.secondary,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
         ),
       ),
     );

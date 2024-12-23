@@ -15,7 +15,6 @@ class Product {
   String availabilityStatus;
   List<Review> reviews;
   String returnPolicy;
-  int minimumOrderQuantity;
   List<String> images;
   String thumbnail;
 
@@ -36,7 +35,6 @@ class Product {
     required this.availabilityStatus,
     required this.reviews,
     required this.returnPolicy,
-    required this.minimumOrderQuantity,
     required this.images,
     required this.thumbnail,
   });
@@ -59,7 +57,6 @@ class Product {
         reviews:
             List<Review>.from(json["reviews"].map((x) => Review.fromJson(x))),
         returnPolicy: json["returnPolicy"],
-        minimumOrderQuantity: json["minimumOrderQuantity"],
         images: List<String>.from(json["images"].map((x) => x)),
         thumbnail: json["thumbnail"],
       );
