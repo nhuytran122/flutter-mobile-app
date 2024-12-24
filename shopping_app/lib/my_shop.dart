@@ -6,6 +6,7 @@ import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/entity/product.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
 import 'package:shopping_app/entity/user.dart';
+import 'package:shopping_app/filter_products_by_category.dart';
 import 'package:shopping_app/my_cart.dart';
 import 'package:shopping_app/my_details_product.dart';
 import 'package:shopping_app/my_profile.dart';
@@ -168,24 +169,25 @@ class _MyShopState extends State<MyShop> {
   Widget buildCategories(List<String> listCategories) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: Container(
-        width: MediaQuery.of(context)
-            .size
-            .width, // Đảm bảo toàn màn hình được sử dụng
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: listCategories.map((category) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GestureDetector(
-                onTap: () {
-                  print('Selected category: $category');
-                },
-                child: buildCategoryCard(Icons.category, category),
-              ),
-            );
-          }).toList(),
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: listCategories.map((category) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        CategoryProductsPage(category: category),
+                  ),
+                );
+              },
+              child: buildCategoryCard(Icons.category, category),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
@@ -530,7 +532,10 @@ class _MyShopState extends State<MyShop> {
             Icons.home_outlined,
             'My Profile',
             () {
-              Navigator.pushNamed(context, MyProfilePage.routeName);
+              setState(() {
+                _selectedIndex = 2;
+              });
+              Navigator.pop(context);
             },
           ),
           Divider(),

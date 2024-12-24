@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shopping_app/delivery_page.dart';
 import 'package:shopping_app/login_page.dart';
 import 'package:shopping_app/my_cart.dart';
 import 'package:shopping_app/my_checkout.dart';
@@ -30,8 +29,6 @@ class MyApp extends StatelessWidget {
           LoginPage.routeName: (context) => LoginPage(),
           MyShoppingCart.routeName: (context) => MyShoppingCart(),
           CheckOutScreen.routeName: (context) => CheckOutScreen(),
-          DeliveryProgressScreen.routeName: (context) =>
-              DeliveryProgressScreen(),
           ThankYouScreen.routeName: (context) => ThankYouScreen(),
           OrderHistoryScreen.routeName: (context) => OrderHistoryScreen(),
           MyShop.routeName: (context) => MyShop(),

@@ -99,7 +99,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '${CommonMethod.formatPrice(product!.rating)} ⭐',
+                        '${product!.rating} ⭐',
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -411,7 +411,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                '\$${p.price}',
+                '${CommonMethod.formatPrice(p.price)}',
                 style: const TextStyle(
                   color: Colors.red,
                   fontWeight: FontWeight.bold,

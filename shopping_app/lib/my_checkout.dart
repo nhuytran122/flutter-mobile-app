@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_app/components/input_field.dart';
-import 'package:shopping_app/delivery_page.dart';
 import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/entity/common_method.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
