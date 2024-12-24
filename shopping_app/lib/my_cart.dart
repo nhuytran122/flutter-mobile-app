@@ -60,7 +60,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
           context,
           MaterialPageRoute(
             builder: (context) => ProductDetailPage(
-              productId: it.id,
+              productId: it.product.id,
             ),
           ),
         ).then((value) {
@@ -70,11 +70,11 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
         });
       },
       child: Dismissible(
-        key: Key(it.id.toString()), // Đảm bảo mỗi item có key riêng biệt
+        key: Key(it.product.id.toString()), // Đảm bảo mỗi item có key riêng biệt
         direction: DismissDirection.endToStart, // Chỉ vuốt từ phải qua trái
         onDismissed: (direction) {
           setState(() {
-            cart.remove(it);
+            cart.remove(it.product);
           });
         },
         background: Container(
@@ -98,7 +98,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
                       width: 80,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: NetworkImage(it.thumbnail),
+                          image: NetworkImage(it.product.thumbnail),
                           fit: BoxFit.cover,
                         ),
                         borderRadius: BorderRadius.circular(4),
@@ -110,7 +110,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            it.title,
+                            it.product.title,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -118,7 +118,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
                           Row(
                             children: [
                               Text(
-                                '${CommonMethod.formatPrice(it.price)}',
+                                '${CommonMethod.formatPrice(it.product.price)}',
                                 style: const TextStyle(
                                   color: Color(0xFFEE4D2D),
                                   fontWeight: FontWeight.bold,
@@ -126,7 +126,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                '${CommonMethod.formatPrice(CommonMethod.calculateOriginalPrice(it.price, it.discountPercentage))}',
+                                '${CommonMethod.formatPrice(CommonMethod.calculateOriginalPrice(it.product.price, it.product.discountPercentage))}',
                                 style: const TextStyle(
                                   decoration: TextDecoration.lineThrough,
                                   color: Colors.grey,
@@ -149,7 +149,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
                           InkWell(
                             onTap: () {
                               setState(() {
-                                cart.addItemInCart(it, quantity: -1);
+                                cart.addItemInCart(it.product, quantity: -1);
                               });
                             },
                             child: Container(
@@ -167,8 +167,8 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
                           InkWell(
                             onTap: () {
                               setState(() {
-                                if (it.quantity < it.stock) {
-                                  cart.addItemInCart(it, quantity: 1);
+                                if (it.quantity < it.product.stock) {
+                                  cart.addItemInCart(it.product, quantity: 1);
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(

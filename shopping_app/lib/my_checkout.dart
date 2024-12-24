@@ -185,7 +185,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
             width: 80,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: NetworkImage(item.thumbnail),
+                image: NetworkImage(item.product.thumbnail),
                 fit: BoxFit.cover,
               ),
               borderRadius: BorderRadius.circular(4),
@@ -196,12 +196,13 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+                Text(item.product.title,
+                    maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
                 Row(
                   children: [
                     Text(
-                      CommonMethod.formatPrice(item.price),
+                      CommonMethod.formatPrice(item.product.price),
                       style: const TextStyle(
                         color: Colors.redAccent,
                         fontWeight: FontWeight.bold,
@@ -211,8 +212,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                         width: 8), // Khoảng cách giữa giá hiện tại và giá gốc
                     Text(
                       CommonMethod.formatPrice(
-                        CommonMethod.calculateOriginalPrice(
-                            item.price, item.discountPercentage),
+                        CommonMethod.calculateOriginalPrice(item.product.price,
+                            item.product.discountPercentage),
                       ),
                       style: const TextStyle(
                         decoration: TextDecoration.lineThrough,
