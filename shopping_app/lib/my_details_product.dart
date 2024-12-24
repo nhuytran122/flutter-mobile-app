@@ -99,7 +99,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '${product!.rating.toStringAsFixed(1)} ⭐',
+                        '${CommonMethod.formatPrice(product!.rating)} ⭐',
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -115,107 +115,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   style: const TextStyle(
                       fontSize: 22, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              Row(
-                children: [
-                  Text(
-                    '\$${product!.price.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(width: 8),
-                  if (product!.discountPercentage > 0)
-                    Text(
-                      '\$${CommonMethod.calculateOriginalPrice(product!.price, product!.discountPercentage).toStringAsFixed(0)}',
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                          decoration: TextDecoration.lineThrough),
-                    ),
-                ],
-              ),
+              buildSectionPrice(),
               const SizedBox(height: 16),
               Text(product!.description, style: const TextStyle(fontSize: 14)),
               const Divider(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove),
-                          onPressed: () {
-                            setState(() {
-                              if (quantity > 1) {
-                                quantity--;
-                              }
-                            });
-                          },
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Text(
-                            '$quantity',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.add),
-                          onPressed: () {
-                            final currentQuantityInCart =
-                                cart.getQuantityItemInCart(product!.id);
-                            final totalQuantityToAdd =
-                                currentQuantityInCart + quantity;
-
-                            setState(() {
-                              if (totalQuantityToAdd < product!.stock) {
-                                quantity++;
-                              } else {
-                                // Hiển thị thông báo nếu tổng số lượng vượt quá tồn kho
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Only ${product!.stock - currentQuantityInCart} more items are available in stock!',
-                                    ),
-                                  ),
-                                );
-                              }
-                            });
-                          },
-                          visualDensity: VisualDensity.compact,
-                        ),
-                      ],
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      setState(() {
-                        cart.add(product!, quantity: quantity);
-                      });
-                    },
-                    icon: const Icon(Icons.shopping_cart),
-                    label: const Text("Add to Cart"),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(20),
-                      backgroundColor: AppColors.secondary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              buildActionAddToCart(context),
               const Divider(height: 32),
               buildDetailRow('Category:', product!.category),
               buildDetailRow('Brand:', product!.brand ?? 'N/A'),
@@ -290,30 +194,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               relatedProducts.isNotEmpty
                   ? SizedBox(
                       height: 220,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: relatedProducts.length,
-                        itemBuilder: (context, index) {
-                          final relatedProduct = relatedProducts[index];
-                          return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ProductDetailPage(
-                                        productId: relatedProduct.id),
-                                  ),
-                                );
-                              },
-                              child: buildRelatedProductCard(
-                                  relatedProducts[index]),
-                            ),
-                          );
-                        },
-                      ),
+                      child: buildRelatedProducts(),
                     )
                   : const Center(
                       child: Text('No related products available.'),
@@ -322,6 +203,136 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Row buildActionAddToCart(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.remove),
+                onPressed: () {
+                  setState(() {
+                    if (quantity > 1) {
+                      quantity--;
+                    }
+                  });
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text(
+                  '$quantity',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  final currentQuantityInCart =
+                      cart.getQuantityItemInCart(product!.id);
+                  final totalQuantityToAdd = currentQuantityInCart + quantity;
+
+                  setState(() {
+                    if (totalQuantityToAdd < product!.stock) {
+                      quantity++;
+                    } else {
+                      // Hiển thị thông báo nếu tổng số lượng vượt quá tồn kho
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Only ${product!.stock - currentQuantityInCart} more items are available in stock!',
+                          ),
+                        ),
+                      );
+                    }
+                  });
+                },
+                visualDensity: VisualDensity.compact,
+              ),
+            ],
+          ),
+        ),
+        buildButtonAddToCart(),
+      ],
+    );
+  }
+
+  ElevatedButton buildButtonAddToCart() {
+    return ElevatedButton.icon(
+      onPressed: () {
+        setState(() {
+          cart.add(product!, quantity: quantity);
+        });
+      },
+      icon: const Icon(Icons.shopping_cart),
+      label: const Text("Add to Cart"),
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.all(20),
+        backgroundColor: AppColors.secondary,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
+  Row buildSectionPrice() {
+    return Row(
+      children: [
+        Text(
+          '${CommonMethod.formatPrice(product!.price)}',
+          style: const TextStyle(
+              fontSize: 18, color: Colors.red, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(width: 8),
+        if (product!.discountPercentage > 0)
+          Text(
+            '${CommonMethod.formatPrice(CommonMethod.calculateOriginalPrice(product!.price, product!.discountPercentage))}',
+            style: const TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+                decoration: TextDecoration.lineThrough),
+          ),
+      ],
+    );
+  }
+
+  ListView buildRelatedProducts() {
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: relatedProducts.length,
+      itemBuilder: (context, index) {
+        final relatedProduct = relatedProducts[index];
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      ProductDetailPage(productId: relatedProduct.id),
+                ),
+              );
+            },
+            child: buildRelatedProductCard(relatedProducts[index]),
+          ),
+        );
+      },
     );
   }
 
@@ -362,7 +373,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     width: 120,
                     fit: BoxFit.cover,
                   ),
-                  if (p.discountPercentage > 0)
+                  if (p.discountPercentage != null && p.discountPercentage > 0)
                     Positioned(
                       top: 5,
                       right: 0,
@@ -407,45 +418,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 ),
               ),
               const SizedBox(height: 8),
-              ElevatedButton.icon(
+              ElevatedButton(
                 onPressed: () {
-                  final currentQuantityInCart =
-                      cart.getQuantityItemInCart(product!.id);
-
-                  int totalQuantityToAdd = currentQuantityInCart + quantity;
-
-                  if (totalQuantityToAdd > product!.stock) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Cannot add more than ${product!.stock} items of ${product!.title} to the cart!',
-                        ),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  } else {
-                    setState(() {
-                      cart.add(product!, quantity: quantity);
-                    });
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          '${product!.title} added to cart (x$quantity)',
-                        ),
-                      ),
-                    );
-                  }
+                  setState(() {
+                    cart.add(p, quantity: 1);
+                  });
                 },
-                icon: const Icon(Icons.shopping_cart),
-                label: const Text("Add to Cart"),
+                child: const Text("Add to cart"),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.all(20),
                   backgroundColor: AppColors.secondary,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
                 ),
               ),
               const SizedBox(height: 8),

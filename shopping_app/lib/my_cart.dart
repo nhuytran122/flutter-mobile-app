@@ -118,7 +118,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
                           Row(
                             children: [
                               Text(
-                                '\$${it.price.toStringAsFixed(0)}',
+                                '${CommonMethod.formatPrice(it.price)}',
                                 style: const TextStyle(
                                   color: Color(0xFFEE4D2D),
                                   fontWeight: FontWeight.bold,
@@ -126,7 +126,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                '\$${(CommonMethod.calculateOriginalPrice(it.price, it.discountPercentage)).toStringAsFixed(0)}',
+                                '${CommonMethod.formatPrice(CommonMethod.calculateOriginalPrice(it.price, it.discountPercentage))}',
                                 style: const TextStyle(
                                   decoration: TextDecoration.lineThrough,
                                   color: Colors.grey,
@@ -225,7 +225,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
                 ),
               ),
               Text(
-                '\$${cart.getTotal().toStringAsFixed(2)}',
+                '${CommonMethod.formatPrice(cart.getTotal())}',
                 style: const TextStyle(
                   fontSize: 18,
                   color: Colors.redAccent,

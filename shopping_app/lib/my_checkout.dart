@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shopping_app/components/input_field.dart';
 import 'package:shopping_app/delivery_page.dart';
 import 'package:shopping_app/entity/appColor.dart';
+import 'package:shopping_app/entity/common_method.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
+import 'package:shopping_app/thank_you.dart';
 
 class CheckOutScreen extends StatefulWidget {
   static String routeName = "/check_out";
@@ -32,13 +34,16 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                 Text("Full Name: ${fullNameController.text}"),
                 Text("Phone Number: ${phoneNumberController.text}"),
                 Text("Address: ${addressController.text}"),
+                Text(
+                    "Total Price: ${CommonMethod.formatPrice(cart.getTotal())}"),
               ],
             ),
           ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pushNamed(context, DeliveryProgressScreen.routeName)
+                cart.items.clear();
+                Navigator.pushNamed(context, ThankYouScreen.routeName)
                     .then((value) {
                   if (value == true) {
                     setState(() {});
@@ -125,7 +130,6 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                 },
               ),
             ),
-            // Tổng cộng
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -138,7 +142,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                   ),
                 ),
                 Text(
-                  '\$${cart.getTotal().toStringAsFixed(2)}',
+                  '${CommonMethod.formatPrice(cart.getTotal())}',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -188,21 +192,37 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
               borderRadius: BorderRadius.circular(4),
             ),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(item.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-                SizedBox(height: 4),
-                Text(
-                  '\$${item.price.toStringAsFixed(0)}',
-                  style: TextStyle(
-                    color: Colors.redAccent,
-                    fontWeight: FontWeight.bold,
-                  ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      CommonMethod.formatPrice(item.price),
+                      style: const TextStyle(
+                        color: Colors.redAccent,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(
+                        width: 8), // Khoảng cách giữa giá hiện tại và giá gốc
+                    Text(
+                      CommonMethod.formatPrice(
+                        CommonMethod.calculateOriginalPrice(
+                            item.price, item.discountPercentage),
+                      ),
+                      style: const TextStyle(
+                        decoration: TextDecoration.lineThrough,
+                        color: Colors.grey,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(width: 4),
               ],
             ),
           ),
@@ -210,7 +230,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
             padding: const EdgeInsets.only(right: 5),
             child: Text(
               'x${item.quantity}',
-              style: TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 14),
             ),
           ),
         ],
