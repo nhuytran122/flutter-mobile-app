@@ -42,7 +42,6 @@ class _MyShopState extends State<MyShop> {
     super.initState();
     lsProduct = ApiService.getAllProducts();
     lsCategories = ApiService.getAllCategories();
-    // userData = Provider.of<UserProvider>(context).userData;
     userData = Provider.of<UserProvider>(context, listen: false).userData;
   }
 
@@ -59,7 +58,7 @@ class _MyShopState extends State<MyShop> {
       case 1:
         return OrderHistoryScreen();
       case 2:
-        return MyProfilePage();
+        return MyProfileScreen();
       default:
         return buildHomePage();
     }
@@ -120,7 +119,7 @@ class _MyShopState extends State<MyShop> {
               buildTitle(
                 "All Products",
                 false,
-                null, // Không cần callback khi `seeMore` là false
+                null,
               ),
               noResultsFound
                   ? buildNoResultsMessage()

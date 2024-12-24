@@ -1,29 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_app/entity/common_method.dart';
 import 'package:shopping_app/entity/order.dart';
+import 'package:shopping_app/order_detail.dart';
 
-class OrderHistoryScreen extends StatelessWidget {
+class OrderHistoryScreen extends StatefulWidget {
   static String routeName = "/order_history";
-
-  static final List<Order> orderHistory = [
-    Order(
-        id: "1",
-        date: DateTime.now().subtract(Duration(days: 1)),
-        total: 250000,
-        items: ["Item A", "Item B"]),
-    Order(
-        id: "2",
-        date: DateTime.now().subtract(Duration(days: 3)),
-        total: 150000,
-        items: ["Item C"]),
-  ];
 
   const OrderHistoryScreen({Key? key}) : super(key: key);
 
   @override
+  State<OrderHistoryScreen> createState() => _OrderHistoryScreenState();
+}
+
+class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: orderHistory.isEmpty
+      body: listOrders.orders.isEmpty
           ? Center(
               child: Text(
                 "You have no orders yet!",
@@ -32,9 +25,9 @@ class OrderHistoryScreen extends StatelessWidget {
             )
           : ListView.builder(
               padding: EdgeInsets.all(8),
-              itemCount: orderHistory.length,
+              itemCount: listOrders.orders.length,
               itemBuilder: (context, index) {
-                final order = orderHistory[index];
+                final order = listOrders.orders[index];
                 return Card(
                   margin: EdgeInsets.symmetric(vertical: 8),
                   child: ListTile(
@@ -48,41 +41,21 @@ class OrderHistoryScreen extends StatelessWidget {
                     ),
                     trailing: Icon(Icons.chevron_right),
                     onTap: () {
-                      showOrderDetails(context, order);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrderDetailScreen(order: order),
+                        ),
+                      ).then((value) {
+                        if (value == true) {
+                          setState(() {});
+                        }
+                      });
                     },
                   ),
                 );
               },
             ),
-    );
-  }
-
-  void showOrderDetails(BuildContext context, Order order) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Order Details"),
-        content: SingleChildScrollView(
-          child: ListBody(
-            children: [
-              Text("Order ID: ${order.id}"),
-              Text("Date: ${CommonMethod.formatDate(order.date)}"),
-              Text("Total: ${CommonMethod.formatPrice(order.total)}"),
-              SizedBox(height: 16),
-              Text("Items:", style: TextStyle(fontWeight: FontWeight.bold)),
-              ...order.items.map((item) => Text("- $item")),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: Text("Close"),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
           ThankYouScreen.routeName: (context) => ThankYouScreen(),
           OrderHistoryScreen.routeName: (context) => OrderHistoryScreen(),
           MyShop.routeName: (context) => MyShop(),
-          MyProfilePage.routeName: (context) => MyProfilePage(),
+          MyProfileScreen.routeName: (context) => MyProfileScreen(),
         },
         theme: ThemeData(
           fontFamily: "Muli",

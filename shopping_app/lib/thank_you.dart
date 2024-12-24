@@ -36,21 +36,6 @@ class ThankYouScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/order_history');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                ),
-                child: Text(
-                  "View Order History",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
-              SizedBox(height: 16),
               TextButton(
                 onPressed: () {
                   Navigator.pushNamed(context, MyShop.routeName);

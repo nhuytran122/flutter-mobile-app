@@ -4,16 +4,16 @@ import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/entity/user.dart';
 import 'package:shopping_app/utils/user_provider.dart';
 
-class MyProfilePage extends StatefulWidget {
+class MyProfileScreen extends StatefulWidget {
   static String routeName = "my_profile";
 
-  const MyProfilePage({Key? key}) : super(key: key);
+  const MyProfileScreen({Key? key}) : super(key: key);
 
   @override
-  State<MyProfilePage> createState() => _MyProfilePageState();
+  State<MyProfileScreen> createState() => _MyProfileScreenState();
 }
 
-class _MyProfilePageState extends State<MyProfilePage> {
+class _MyProfileScreenState extends State<MyProfileScreen> {
   late User? userData;
 
   @override

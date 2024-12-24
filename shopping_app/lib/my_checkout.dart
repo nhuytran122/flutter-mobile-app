@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shopping_app/components/input_field.dart';
 import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/entity/common_method.dart';
+import 'package:shopping_app/entity/order.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
+import 'package:shopping_app/entity/user.dart';
 import 'package:shopping_app/thank_you.dart';
+import 'package:shopping_app/utils/user_provider.dart';
 
 class CheckOutScreen extends StatefulWidget {
   static String routeName = "/check_out";
@@ -20,6 +24,13 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   final fullNameController = TextEditingController();
   final phoneNumberController = TextEditingController();
   final addressController = TextEditingController();
+  late User? userData;
+
+  @override
+  void initState() {
+    super.initState();
+    userData = Provider.of<UserProvider>(context, listen: false).userData;
+  }
 
   void userTappedPay() {
     if (formKey.currentState!.validate()) {
@@ -41,7 +52,12 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                cart.items.clear();
+                listOrders.createOrderFromCart(
+                    cart,
+                    fullNameController.text,
+                    phoneNumberController.text,
+                    addressController.text,
+                    userData!.id);
                 Navigator.pushNamed(context, ThankYouScreen.routeName)
                     .then((value) {
                   if (value == true) {
@@ -208,8 +224,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(
-                        width: 8), // Khoảng cách giữa giá hiện tại và giá gốc
+                    const SizedBox(width: 8),
                     Text(
                       CommonMethod.formatPrice(
                         CommonMethod.calculateOriginalPrice(item.product.price,
