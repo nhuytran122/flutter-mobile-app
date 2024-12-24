@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/entity/common_method.dart';
-import 'package:shopping_app/entity/order.dart'; 
+import 'package:shopping_app/entity/order.dart';
 
 class OrderHistoryScreen extends StatelessWidget {
   static String routeName = "/order_history";
@@ -24,13 +24,6 @@ class OrderHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        title: Text(
-          "Order History",
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
       body: orderHistory.isEmpty
           ? Center(
               child: Text(

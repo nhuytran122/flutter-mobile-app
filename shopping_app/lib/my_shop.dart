@@ -9,6 +9,7 @@ import 'package:shopping_app/entity/user.dart';
 import 'package:shopping_app/my_cart.dart';
 import 'package:shopping_app/my_details_product.dart';
 import 'package:shopping_app/my_profile.dart';
+import 'package:shopping_app/order_history.dart';
 import 'package:shopping_app/utils/api_service.dart';
 import 'package:shopping_app/utils/user_provider.dart';
 
@@ -29,6 +30,7 @@ class _MyShopState extends State<MyShop> {
   List<Product> discountedProducts = [];
   String searchQuery = "";
   late User? userData;
+  int _selectedIndex = 0;
 
   late Future<List<Product>> lsProduct;
 
@@ -38,6 +40,60 @@ class _MyShopState extends State<MyShop> {
     lsProduct = ApiService.getAllProducts();
     // userData = Provider.of<UserProvider>(context).userData;
     userData = Provider.of<UserProvider>(context, listen: false).userData;
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  Widget _getBodyContent() {
+    switch (_selectedIndex) {
+      case 0:
+        return buildHomePage();
+      case 1:
+        return OrderHistoryScreen();
+      case 2:
+        return MyProfilePage();
+      default:
+        return buildHomePage();
+    }
+  }
+
+  Widget buildHomePage() {
+    return FutureBuilder<List<Product>>(
+      future: lsProduct,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text("No products found."));
+        } else {
+          allProducts = snapshot.data!;
+          if (filteredProducts.isEmpty && !noResultsFound) {
+            filteredProducts = allProducts;
+          }
+          List<String> listCategories = getListCategories(allProducts);
+          List<String> listTags = getListTags(allProducts);
+
+          return ListView(
+            children: [
+              buildCategories(listCategories),
+              buildTags(listTags),
+              buildTitle("Top Products Discounted"),
+              buildTopSales(getTopSaleProducts(allProducts)),
+              buildTitle("All Products"),
+              noResultsFound
+                  ? buildNoResultsMessage()
+                  : buildProductList(filteredProducts),
+            ],
+          );
+        }
+      },
+    );
   }
 
   List<String> getListCategories(List<Product> products) {
@@ -87,37 +143,24 @@ class _MyShopState extends State<MyShop> {
     return Scaffold(
       drawer: myDrawer(context),
       appBar: myAppBar(context),
-      body: FutureBuilder<List<Product>>(
-        future: lsProduct,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}"));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No products found."));
-          } else {
-            allProducts = snapshot.data!;
-            if (filteredProducts.isEmpty && !noResultsFound) {
-              filteredProducts = allProducts;
-            }
-            List<String> listCategories = getListCategories(allProducts);
-            List<String> listTags = getListTags(allProducts);
-
-            return ListView(
-              children: [
-                buildCategories(listCategories),
-                buildTags(listTags),
-                buildTitle("Top Products Discounted"),
-                buildTopSales(getTopSaleProducts(allProducts)),
-                buildTitle("All Products"),
-                noResultsFound
-                    ? buildNoResultsMessage()
-                    : buildProductList(filteredProducts),
-              ],
-            );
-          }
-        },
+      body: _getBodyContent(),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: "Home",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: "Orders History",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: "My Profile",
+          ),
+        ],
       ),
     );
   }
@@ -371,9 +414,21 @@ class _MyShopState extends State<MyShop> {
         children: [
           Expanded(
             child: TextField(
+              onTap: () {
+                if (_selectedIndex != 0) {
+                  // Chuyển về Home nếu đang không ở trang Home
+                  setState(() {
+                    _selectedIndex = 0;
+                  });
+                }
+              },
               onChanged: (value) {
-                searchQuery = value;
-                filterProducts();
+                setState(() {
+                  searchQuery = value;
+                  if (_selectedIndex == 0) {
+                    filterProducts(); // Chỉ tìm kiếm nếu đang ở trang Home
+                  }
+                });
               },
               decoration: const InputDecoration(
                 hintText: 'Search products...',
@@ -406,7 +461,6 @@ class _MyShopState extends State<MyShop> {
               ),
             ),
             cart.items.length == 0 ? SizedBox.shrink() : myIconCart(),
-            2 == 0 ? SizedBox.shrink() : myIconCart(),
           ],
         ),
       ],

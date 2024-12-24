@@ -26,30 +26,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: myAppBar(context),
       body: myProfileBody(),
-    );
-  }
-
-  AppBar myAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.primary,
-      leading: IconButton(
-        onPressed: () {
-          Navigator.pop(context);
-        },
-        icon: Icon(
-          Icons.arrow_back,
-          color: Colors.white,
-          size: 30,
-        ),
-      ),
-      title: Center(
-        child: Text(
-          "My Profile",
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
     );
   }
 
