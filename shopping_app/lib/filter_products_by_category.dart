@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shopping_app/components/icon_cart.dart';
 import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/entity/product.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
 import 'package:shopping_app/my_cart.dart';
 import 'package:shopping_app/my_details_product.dart';
-import 'package:shopping_app/utils/api_service.dart'; 
+import 'package:shopping_app/utils/api_service.dart';
+import 'package:shopping_app/utils/navigate_helper.dart';
 
 class CategoryProductsScreen extends StatefulWidget {
   final String category;
@@ -214,47 +216,21 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
           children: [
             IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, MyShoppingCart.routeName)
-                    .then((value) {
-                  if (value == true) {
-                    setState(() {}); // Cập nhật khi quay về
-                  }
-                });
+                navigateToScreenNamed(
+                  context,
+                  MyShoppingCart.routeName,
+                  setState, // Truyền setState để cập nhật giao diện khi quay lại
+                );
               },
               icon: const Icon(
                 Icons.shopping_cart,
                 color: Colors.black,
               ),
             ),
-            cart.items.isEmpty ? const SizedBox.shrink() : myIconCart(),
+            cart.items.isEmpty ? const SizedBox.shrink() : MyIconCart(),
           ],
         ),
       ],
-    );
-  }
-
-  Positioned myIconCart() {
-    return Positioned(
-      right: 5,
-      top: 5,
-      child: Container(
-        height: 15,
-        width: 15,
-        decoration: const BoxDecoration(
-          color: Colors.red,
-          shape: BoxShape.circle,
-        ),
-        child: Center(
-          child: Text(
-            '${cart.items.length}',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

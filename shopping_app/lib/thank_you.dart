@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/my_shop.dart';
+import 'package:shopping_app/utils/navigate_helper.dart';
 
-class ThankYouScreen extends StatelessWidget {
+class ThankYouScreen extends StatefulWidget {
   static String routeName = "/thank_you";
 
   const ThankYouScreen({Key? key}) : super(key: key);
 
+  @override
+  State<ThankYouScreen> createState() => _ThankYouScreenState();
+}
+
+class _ThankYouScreenState extends State<ThankYouScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +44,7 @@ class ThankYouScreen extends StatelessWidget {
               SizedBox(height: 32),
               TextButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, MyShop.routeName);
+                  navigateToScreenNamed(context, MyShop.routeName, setState);
                 },
                 child: Text(
                   "Back to Home",

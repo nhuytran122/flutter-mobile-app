@@ -7,6 +7,7 @@ import 'package:shopping_app/entity/order.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
 import 'package:shopping_app/entity/user.dart';
 import 'package:shopping_app/thank_you.dart';
+import 'package:shopping_app/utils/navigate_helper.dart';
 import 'package:shopping_app/utils/user_provider.dart';
 
 class CheckOutScreen extends StatefulWidget {
@@ -58,12 +59,11 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                     phoneNumberController.text,
                     addressController.text,
                     userData!.id);
-                Navigator.pushNamed(context, ThankYouScreen.routeName)
-                    .then((value) {
-                  if (value == true) {
-                    setState(() {});
-                  }
-                });
+                navigateToScreenNamed(
+                  context,
+                  ThankYouScreen.routeName,
+                  setState,
+                );
               },
               child: Text("Confirm"),
             ),

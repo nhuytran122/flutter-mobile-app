@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shopping_app/entity/common_method.dart';
 import 'package:shopping_app/entity/order.dart';
 import 'package:shopping_app/order_detail.dart';
+import 'package:shopping_app/utils/navigate_helper.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
   static String routeName = "/order_history";
@@ -41,16 +42,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     ),
                     trailing: Icon(Icons.chevron_right),
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OrderDetailScreen(order: order),
-                        ),
-                      ).then((value) {
-                        if (value == true) {
-                          setState(() {});
-                        }
-                      });
+                      navigateToScreenWithPara(
+                          context, OrderDetailScreen(order: order), setState);
                     },
                   ),
                 );

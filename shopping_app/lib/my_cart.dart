@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shopping_app/components/icon_cart.dart';
 import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/entity/common_method.dart';
 import 'package:shopping_app/entity/constants.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
 import 'package:shopping_app/my_checkout.dart';
 import 'package:shopping_app/my_details_product.dart';
+import 'package:shopping_app/utils/navigate_helper.dart';
 
 class MyShoppingCart extends StatefulWidget {
   static String routeName = "/cart";
@@ -56,21 +58,12 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
   Widget _buildShopSection(ItemInCart it) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProductDetailPage(
-              productId: it.product.id,
-            ),
-          ),
-        ).then((value) {
-          if (value == true) {
-            setState(() {});
-          }
-        });
+        navigateToScreenWithPara(
+            context, ProductDetailPage(productId: it.product.id), setState);
       },
       child: Dismissible(
-        key: Key(it.product.id.toString()), // Đảm bảo mỗi item có key riêng biệt
+        key:
+            Key(it.product.id.toString()), // Đảm bảo mỗi item có key riêng biệt
         direction: DismissDirection.endToStart, // Chỉ vuốt từ phải qua trái
         onDismissed: (direction) {
           setState(() {
@@ -236,12 +229,11 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pushNamed(context, CheckOutScreen.routeName)
-                  .then((value) {
-                if (value == true) {
-                  setState(() {}); // Cập nhật khi quay về
-                }
-              });
+              navigateToScreenNamed(
+                context,
+                CheckOutScreen.routeName,
+                setState,
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFE86343),
@@ -297,36 +289,11 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
                   color: Colors.white,
                 ),
               ),
-              cart.items.length == 0 ? SizedBox.shrink() : myIconCart(),
+              cart.items.length == 0 ? SizedBox.shrink() : MyIconCart(),
             ],
           ),
         ),
       ],
-    );
-  }
-
-  Positioned myIconCart() {
-    return Positioned(
-      right: 5,
-      top: 5,
-      child: Container(
-        height: 15,
-        width: 15,
-        decoration: BoxDecoration(
-          color: Colors.red,
-          shape: BoxShape.circle,
-        ),
-        child: Center(
-          child: Text(
-            '${cart.items.length}',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

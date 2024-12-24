@@ -4,6 +4,7 @@ import 'package:shopping_app/entity/common_method.dart';
 import 'package:shopping_app/entity/order.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
 import 'package:shopping_app/my_details_product.dart';
+import 'package:shopping_app/utils/navigate_helper.dart';
 
 class OrderDetailScreen extends StatefulWidget {
   static String routeName = "/order_detail";
@@ -57,15 +58,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             ),
             const SizedBox(height: 10),
             ListView.builder(
-              shrinkWrap:
-                  true,
+              shrinkWrap: true,
               itemCount: widget.order.items.length,
               itemBuilder: (context, index) {
                 final item = widget.order.items[index];
                 return _buildCartItem(item);
               },
             ),
-            const SizedBox(height: 16), 
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -96,18 +96,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Widget _buildCartItem(ItemInCart item) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProductDetailPage(
-              productId: item.product.id,
-            ),
-          ),
-        ).then((value) {
-          if (value == true) {
-            setState(() {});
-          }
-        });
+        navigateToScreenWithPara(
+            context, ProductDetailPage(productId: item.product.id), setState);
       },
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 4),

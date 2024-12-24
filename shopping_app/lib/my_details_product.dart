@@ -7,6 +7,7 @@ import 'package:shopping_app/filter_products_by_category.dart';
 import 'package:shopping_app/my_cart.dart';
 import 'package:shopping_app/my_reviews_page.dart';
 import 'package:shopping_app/utils/api_service.dart';
+import 'package:shopping_app/utils/navigate_helper.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final int productId;
@@ -124,17 +125,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               const Divider(height: 32),
               GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            CategoryProductsScreen(category: product!.category),
-                      ),
-                    ).then((value) {
-                      if (value == true) {
-                        setState(() {});
-                      }
-                    });
+                    navigateToScreenWithPara(
+                        context,
+                        CategoryProductsScreen(category: product!.category),
+                        setState);
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -204,13 +198,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 Center(
                   child: TextButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              FullReviewPage(reviews: product!.reviews),
-                        ),
-                      );
+                      navigateToScreenWithPara(context,
+                          FullReviewPage(reviews: product!.reviews), setState);
                     },
                     child: const Text(
                       'See More Reviews',
@@ -353,13 +342,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      ProductDetailPage(productId: relatedProduct.id),
-                ),
-              );
+              navigateToScreenWithPara(context,
+                  ProductDetailPage(productId: relatedProduct.id), setState);
             },
             child: buildRelatedProductCard(relatedProducts[index]),
           ),
@@ -378,18 +362,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   Widget buildRelatedProductCard(Product p) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProductDetailPage(
-              productId: p.id,
-            ),
-          ),
-        ).then((value) {
-          if (value == true) {
-            setState(() {});
-          }
-        });
+        navigateToScreenWithPara(
+            context, ProductDetailPage(productId: p.id), setState);
       },
       child: Container(
         width: 150,
@@ -489,12 +463,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           children: [
             IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, MyShoppingCart.routeName)
-                    .then((value) {
-                  if (value == true) {
-                    setState(() {});
-                  }
-                });
+                navigateToScreenNamed(
+                  context,
+                  MyShoppingCart.routeName,
+                  setState,
+                );
               },
               icon: const Icon(Icons.shopping_cart, color: Colors.black),
             ),

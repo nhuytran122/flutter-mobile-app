@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shopping_app/components/icon_cart.dart';
 import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/entity/common_method.dart';
 import 'package:shopping_app/entity/constants.dart';
 import 'package:shopping_app/entity/product.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
 import 'package:shopping_app/my_details_product.dart';
+import 'package:shopping_app/utils/navigate_helper.dart';
 
 class DiscountedProductsScreen extends StatefulWidget {
   static String routeName = '/discounted_products';
@@ -38,18 +40,8 @@ class _DiscountedProductsScreenState extends State<DiscountedProductsScreen> {
   Widget _buildCartItem(Product item) {
     return GestureDetector(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ProductDetailPage(
-                productId: item.id,
-              ),
-            ),
-          ).then((value) {
-            if (value == true) {
-              setState(() {});
-            }
-          });
+          navigateToScreenWithPara(
+              context, ProductDetailPage(productId: item.id), setState);
         },
         child: Card(
           margin: const EdgeInsets.symmetric(vertical: 4),
@@ -170,36 +162,11 @@ class _DiscountedProductsScreenState extends State<DiscountedProductsScreen> {
                   color: Colors.white,
                 ),
               ),
-              cart.items.length == 0 ? SizedBox.shrink() : myIconCart(),
+              cart.items.length == 0 ? SizedBox.shrink() : MyIconCart(),
             ],
           ),
         ),
       ],
-    );
-  }
-
-  Positioned myIconCart() {
-    return Positioned(
-      right: 5,
-      top: 5,
-      child: Container(
-        height: 15,
-        width: 15,
-        decoration: BoxDecoration(
-          color: Colors.red,
-          shape: BoxShape.circle,
-        ),
-        child: Center(
-          child: Text(
-            '${cart.items.length}',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
