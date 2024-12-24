@@ -4,29 +4,28 @@ import 'package:shopping_app/entity/product.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
 import 'package:shopping_app/my_cart.dart';
 import 'package:shopping_app/my_details_product.dart';
-import 'package:shopping_app/utils/api_service.dart'; // Thêm import cho ApiService
+import 'package:shopping_app/utils/api_service.dart'; 
 
-class CategoryProductsPage extends StatefulWidget {
+class CategoryProductsScreen extends StatefulWidget {
   final String category;
 
-  const CategoryProductsPage({
+  const CategoryProductsScreen({
     Key? key,
     required this.category,
   }) : super(key: key);
 
   @override
-  State<CategoryProductsPage> createState() => _CategoryProductsPageState();
+  State<CategoryProductsScreen> createState() => _CategoryProductsScreenState();
 }
 
-class _CategoryProductsPageState extends State<CategoryProductsPage> {
+class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
   late Future<List<Product>> futureProducts;
-  String searchQuery = ""; // Biến lưu trữ từ khóa tìm kiếm
+  String searchQuery = "";
 
   @override
   void initState() {
     super.initState();
-    futureProducts = ApiService.getProductsByCategoryID(
-        widget.category); // Lấy tất cả sản phẩm theo category
+    futureProducts = ApiService.getProductsByCategoryID(widget.category);
   }
 
   // Hàm tìm kiếm sản phẩm theo từ khóa
@@ -110,7 +109,7 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
                     width: 120,
                     fit: BoxFit.cover,
                   ),
-                  if (p.discountPercentage != null && p.discountPercentage > 0)
+                  if (p.discountPercentage > 0)
                     Positioned(
                       top: 5,
                       right: 0,
@@ -178,17 +177,27 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
   AppBar myAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: AppColors.primary,
+      leading: IconButton(
+        onPressed: () {
+          Navigator.pop(context, true);
+        },
+        icon: Icon(
+          Icons.arrow_back,
+          color: Colors.white,
+          size: 30,
+        ),
+      ),
       title: Row(
         children: [
           Expanded(
             child: TextField(
               onChanged: (value) {
                 setState(() {
-                  searchQuery = value; // Cập nhật từ khóa tìm kiếm
+                  searchQuery = value;
                 });
               },
-              decoration: const InputDecoration(
-                hintText: 'Search products in this category...',
+              decoration: InputDecoration(
+                hintText: 'Search products in ${widget.category} category',
                 hintStyle: TextStyle(color: Colors.white70),
                 border: InputBorder.none,
                 prefixIcon: Icon(Icons.search, color: Colors.white),

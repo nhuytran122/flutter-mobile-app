@@ -277,14 +277,13 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
           size: 30,
         ),
       ),
-      title: Center(
-        child: Text(
-          "Your Cart".toUpperCase(),
-          style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: Constants.FONT_SIZE_TITLE),
-        ),
+      centerTitle: true,
+      title: Text(
+        "Your Cart".toUpperCase(),
+        style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: Constants.FONT_SIZE_TITLE),
       ),
       actions: [
         Padding(

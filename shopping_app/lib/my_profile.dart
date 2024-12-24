@@ -46,11 +46,12 @@ class _MyProfilePageState extends State<MyProfilePage> {
           ),
           SizedBox(height: 16),
           Text(
-            userData != null &&
-                    (userData?.firstName?.isNotEmpty ?? false) &&
-                    (userData?.lastName?.isNotEmpty ?? false)
-                ? '${userData?.firstName} ${userData?.lastName}'
-                : 'Guest',
+            '${userData?.firstName ?? ''} ${userData?.lastName ?? ''}'
+                    .trim()
+                    .isEmpty
+                ? 'Guest'
+                : '${userData?.firstName ?? ''} ${userData?.lastName ?? ''}'
+                    .trim(),
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -77,7 +78,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 Icons.calendar_today),
             buildInforUser(
               "Address",
-              "${userData?.address?.address ?? ""}, ${userData?.address?.city ?? ""}, ${userData?.address?.state ?? ""}",
+              "${userData?.address.address}, ${userData?.address.city}, ${userData?.address.state}",
               Icons.location_on,
             ),
           ] else ...[

@@ -1,8 +1,9 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shopping_app/discounted_products.dart';
 
 import 'package:shopping_app/entity/appColor.dart';
+import 'package:shopping_app/entity/category.dart';
 import 'package:shopping_app/entity/product.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
 import 'package:shopping_app/entity/user.dart';
@@ -34,11 +35,13 @@ class _MyShopState extends State<MyShop> {
   int _selectedIndex = 0;
 
   late Future<List<Product>> lsProduct;
+  late Future<List<Category>> lsCategories;
 
   @override
   void initState() {
     super.initState();
     lsProduct = ApiService.getAllProducts();
+    lsCategories = ApiService.getAllCategories();
     // userData = Provider.of<UserProvider>(context).userData;
     userData = Provider.of<UserProvider>(context, listen: false).userData;
   }
@@ -77,16 +80,48 @@ class _MyShopState extends State<MyShop> {
           if (filteredProducts.isEmpty && !noResultsFound) {
             filteredProducts = allProducts;
           }
-          List<String> listCategories = getListCategories(allProducts);
           List<String> listTags = getListTags(allProducts);
 
           return ListView(
             children: [
-              buildCategories(listCategories),
+              FutureBuilder<List<Category>>(
+                future: lsCategories,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text("Error: ${snapshot.error}"));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text("No categories found."));
+                  } else {
+                    return buildCategories(snapshot.data!);
+                  }
+                },
+              ),
               buildTags(listTags),
-              buildTitle("Top Products Discounted"),
-              buildTopSales(getTopSaleProducts(allProducts)),
-              buildTitle("All Products"),
+              buildTitle(
+                "Top Products Discounted",
+                true,
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DiscountedProductsScreen(
+                          discountedProducts: discountedProducts),
+                    ),
+                  ).then((value) {
+                    if (value == true) {
+                      setState(() {});
+                    }
+                  });
+                },
+              ),
+              buildTopSales(getTopSaleProducts(allProducts).take(5).toList()),
+              buildTitle(
+                "All Products",
+                false,
+                null, // Không cần callback khi `seeMore` là false
+              ),
               noResultsFound
                   ? buildNoResultsMessage()
                   : buildProductList(filteredProducts),
@@ -97,38 +132,27 @@ class _MyShopState extends State<MyShop> {
     );
   }
 
-  List<String> getListCategories(List<Product> products) {
-    return products.map((product) => product.category).toSet().toList();
-  }
-
   List<String> getListTags(List<Product> products) {
     final tags = <String>{};
     for (var product in products) {
-      if (product.tags != null) {
-        tags.addAll(product.tags!);
-      }
+      tags.addAll(product.tags);
     }
     return tags.toList();
   }
 
   List<Product> getTopSaleProducts(List<Product> products) {
-    discountedProducts = allProducts
-        .where((product) => product.discountPercentage != null)
-        .toList();
-
+    discountedProducts =
+        products.where((product) => product.discountPercentage > 0).toList();
     discountedProducts
         .sort((a, b) => b.discountPercentage.compareTo(a.discountPercentage));
-
-    discountedProducts = discountedProducts.take(10).toList();
-    return discountedProducts;
+    return discountedProducts.take(10).toList();
   }
 
   void filterProducts() {
     setState(() {
       filteredProducts = allProducts.where((product) {
         final matchesTags = selectedTags.isEmpty ||
-            (product.tags != null &&
-                product.tags!.any((tag) => selectedTags.contains(tag)));
+            (product.tags.any((tag) => selectedTags.contains(tag)));
         final matchesQuery = searchQuery.isEmpty ||
             product.title.toLowerCase().contains(searchQuery.toLowerCase());
         return matchesTags && matchesQuery;
@@ -166,7 +190,7 @@ class _MyShopState extends State<MyShop> {
     );
   }
 
-  Widget buildCategories(List<String> listCategories) {
+  Widget buildCategories(List<Category> listCategories) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -180,11 +204,16 @@ class _MyShopState extends State<MyShop> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        CategoryProductsPage(category: category),
+                        CategoryProductsScreen(category: category.slug),
                   ),
-                );
+                ).then((value) {
+                  if (value == true) {
+                    setState(() {});
+                  }
+                });
+                ;
               },
-              child: buildCategoryCard(Icons.category, category),
+              child: buildCategoryCard(Icons.category, category.name),
             ),
           );
         }).toList(),
@@ -264,7 +293,8 @@ class _MyShopState extends State<MyShop> {
     );
   }
 
-  Widget buildTitle(String title) {
+  Widget buildTitle(String title, bool seeMore,
+      [VoidCallback? onSeeMorePressed]) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -278,7 +308,16 @@ class _MyShopState extends State<MyShop> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const Text("See more"),
+          if (seeMore)
+            GestureDetector(
+              onTap: onSeeMorePressed ?? () {},
+              child: const Text(
+                "See more",
+                style: TextStyle(
+                  color: AppColors.secondary,
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -314,7 +353,7 @@ class _MyShopState extends State<MyShop> {
                     width: 120,
                     fit: BoxFit.cover,
                   ),
-                  if (p.discountPercentage != null && p.discountPercentage > 0)
+                  if (p.discountPercentage > 0)
                     Positioned(
                       top: 5,
                       right: 0,
@@ -418,7 +457,6 @@ class _MyShopState extends State<MyShop> {
             child: TextField(
               onTap: () {
                 if (_selectedIndex != 0) {
-                  // Chuyển về Home nếu đang không ở trang Home
                   setState(() {
                     _selectedIndex = 0;
                   });
@@ -433,7 +471,7 @@ class _MyShopState extends State<MyShop> {
                 });
               },
               decoration: const InputDecoration(
-                hintText: 'Search products...',
+                hintText: 'Search Products...',
                 hintStyle: TextStyle(color: Colors.white70),
                 border: InputBorder.none,
                 prefixIcon: Icon(Icons.search, color: Colors.white),
@@ -486,7 +524,7 @@ class _MyShopState extends State<MyShop> {
                 CircleAvatar(
                   radius: 50,
                   backgroundImage: NetworkImage(
-                    userData?.image ?? 'https://via.placeholder.com/150',
+                    userData?.image ?? 'assets/images/default-avatar.jpg',
                   ),
                 ),
                 const SizedBox(
@@ -527,6 +565,16 @@ class _MyShopState extends State<MyShop> {
                 ),
               ],
             ),
+          ),
+          myOptionalInDrawer(
+            Icons.home_outlined,
+            'Home',
+            () {
+              setState(() {
+                _selectedIndex = 0;
+              });
+              Navigator.pop(context);
+            },
           ),
           myOptionalInDrawer(
             Icons.home_outlined,

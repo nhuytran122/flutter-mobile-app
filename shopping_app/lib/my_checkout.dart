@@ -250,11 +250,11 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
           size: 30,
         ),
       ),
+      centerTitle: true,
       title: Text(
         "Checkout",
         style: TextStyle(color: Colors.white),
       ),
     );
-    ;
   }
 }

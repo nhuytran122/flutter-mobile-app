@@ -11,6 +11,7 @@ class FullReviewPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text('All Reviews'),
         backgroundColor: AppColors.primary,
       ),

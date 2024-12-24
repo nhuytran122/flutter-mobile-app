@@ -12,7 +12,7 @@ class ThankYouScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        automaticallyImplyLeading: false,
+        centerTitle: true,
         title: Text(
           "Thank You!",
           style: TextStyle(color: Colors.white),

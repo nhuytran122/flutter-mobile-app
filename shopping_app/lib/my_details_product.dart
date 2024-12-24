@@ -3,6 +3,7 @@ import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/entity/common_method.dart';
 import 'package:shopping_app/entity/product.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
+import 'package:shopping_app/filter_products_by_category.dart';
 import 'package:shopping_app/my_cart.dart';
 import 'package:shopping_app/my_reviews_page.dart';
 import 'package:shopping_app/utils/api_service.dart';
@@ -121,7 +122,38 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               const Divider(height: 32),
               buildActionAddToCart(context),
               const Divider(height: 32),
-              buildDetailRow('Category:', product!.category),
+              GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            CategoryProductsScreen(category: product!.category),
+                      ),
+                    ).then((value) {
+                      if (value == true) {
+                        setState(() {});
+                      }
+                    });
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Category:',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          product!.category,
+                          style: TextStyle(
+                            color: AppColors.secondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
               buildDetailRow('Brand:', product!.brand ?? 'N/A'),
               buildDetailRow('Stock:', '${product!.stock} items'),
               buildDetailRow('Weight:', '${product!.weight} kg'),
@@ -373,7 +405,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     width: 120,
                     fit: BoxFit.cover,
                   ),
-                  if (p.discountPercentage != null && p.discountPercentage > 0)
+                  if (p.discountPercentage > 0)
                     Positioned(
                       top: 5,
                       right: 0,
@@ -440,6 +472,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   AppBar myAppBar(BuildContext context) {
     return AppBar(
+      centerTitle: true,
       backgroundColor: AppColors.primary,
       leading: IconButton(
         onPressed: () {
@@ -447,11 +480,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         },
         icon: Icon(Icons.arrow_back, color: Colors.white, size: 30),
       ),
-      title: Center(
-        child: Text(
-          product!.title,
-          style: const TextStyle(color: Colors.white),
-        ),
+      title: Text(
+        product!.title,
+        style: const TextStyle(color: Colors.white),
       ),
       actions: [
         Stack(
