@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/entity/product.dart';
@@ -9,15 +10,12 @@ import 'package:shopping_app/my_cart.dart';
 import 'package:shopping_app/my_details_product.dart';
 import 'package:shopping_app/my_profile.dart';
 import 'package:shopping_app/utils/api_service.dart';
+import 'package:shopping_app/utils/user_provider.dart';
 
 class MyShop extends StatefulWidget {
   static String routeName = "/home";
-  final User userData;
 
-  const MyShop({
-    Key? key,
-    required this.userData,
-  }) : super(key: key);
+  const MyShop({Key? key}) : super(key: key);
 
   @override
   State<MyShop> createState() => _MyShopState();
@@ -30,6 +28,7 @@ class _MyShopState extends State<MyShop> {
   List<String> selectedTags = [];
   List<Product> discountedProducts = [];
   String searchQuery = "";
+  late User? userData;
 
   late Future<List<Product>> lsProduct;
 
@@ -37,6 +36,8 @@ class _MyShopState extends State<MyShop> {
   void initState() {
     super.initState();
     lsProduct = ApiService.getAllProducts();
+    // userData = Provider.of<UserProvider>(context).userData;
+    userData = Provider.of<UserProvider>(context, listen: false).userData;
   }
 
   List<String> getListCategories(List<Product> products) {
@@ -413,6 +414,7 @@ class _MyShopState extends State<MyShop> {
   }
 
   Widget myDrawer(BuildContext context) {
+    final userData = Provider.of<UserProvider>(context).userData;
     return Container(
       width: MediaQuery.of(context).size.width * 2 / 3,
       decoration: const BoxDecoration(color: Colors.white),
@@ -428,7 +430,7 @@ class _MyShopState extends State<MyShop> {
                 CircleAvatar(
                   radius: 50,
                   backgroundImage: NetworkImage(
-                    widget.userData.image ?? 'https://via.placeholder.com/150',
+                    userData?.image ?? 'https://via.placeholder.com/150',
                   ),
                 ),
                 const SizedBox(
@@ -440,11 +442,11 @@ class _MyShopState extends State<MyShop> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        '${widget.userData.firstName ?? ''} ${widget.userData.lastName ?? ''}'
+                        '${userData?.firstName ?? ''} ${userData?.lastName ?? ''}'
                                 .trim()
                                 .isEmpty
                             ? 'Guest'
-                            : '${widget.userData.firstName ?? ''} ${widget.userData.lastName ?? ''}'
+                            : '${userData?.firstName ?? ''} ${userData?.lastName ?? ''}'
                                 .trim(),
                         style: const TextStyle(
                           color: Colors.white,
@@ -456,7 +458,7 @@ class _MyShopState extends State<MyShop> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        widget.userData.email ?? '',
+                        userData?.email ?? '',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -474,13 +476,7 @@ class _MyShopState extends State<MyShop> {
             Icons.home_outlined,
             'My Profile',
             () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      MyProfilePage(userData: widget.userData),
-                ),
-              );
+              Navigator.pushNamed(context, MyProfilePage.routeName);
             },
           ),
           Divider(),

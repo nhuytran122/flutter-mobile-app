@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/my_shop.dart';
 import 'package:shopping_app/utils/api_service.dart';
+import 'package:shopping_app/utils/user_provider.dart';
 
 class LoginPage extends StatefulWidget {
   static String routeName = "/login";
@@ -26,12 +28,11 @@ class _LoginPageState extends State<LoginPage> {
       final userData = await ApiService.getUserData(data['accessToken']);
 
       if (userData != null) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MyShop(userData: userData),
-          ),
-        );
+        // Lưu userData vào Provider
+        Provider.of<UserProvider>(context, listen: false).setUserData(userData);
+
+        // Navigator.pushNamed(context, MyShop.routeName);
+        Navigator.pushReplacementNamed(context, MyShop.routeName);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to load user data')),
