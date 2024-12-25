@@ -19,56 +19,7 @@ class MyDrawer extends StatelessWidget {
       decoration: const BoxDecoration(color: Colors.white),
       child: ListView(
         children: [
-          DrawerHeader(
-            decoration: const BoxDecoration(
-              color: AppColors.primary,
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: NetworkImage(
-                    userData?.image ?? 'assets/images/default-avatar.jpg',
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${userData?.firstName ?? ''} ${userData?.lastName ?? ''}'
-                                .trim()
-                                .isEmpty
-                            ? 'Guest'
-                            : '${userData?.firstName ?? ''} ${userData?.lastName ?? ''}'
-                                .trim(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        userData?.email ?? '',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _buildDrawerHeader(),
           _buildDrawerItem(
             context,
             icon: Icons.home_outlined,
@@ -93,6 +44,59 @@ class MyDrawer extends StatelessWidget {
           _buildDrawerItem(context,
               icon: Icons.settings_outlined, label: 'Setting'),
           _buildDrawerItem(context, icon: Icons.help_outline, label: 'Help'),
+        ],
+      ),
+    );
+  }
+
+  DrawerHeader _buildDrawerHeader() {
+    return DrawerHeader(
+      decoration: const BoxDecoration(
+        color: AppColors.primary,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            radius: 50,
+            backgroundImage: NetworkImage(
+              userData?.image ?? 'assets/images/default-avatar.jpg',
+            ),
+          ),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '${userData?.firstName ?? ''} ${userData?.lastName ?? ''}'
+                          .trim()
+                          .isEmpty
+                      ? 'Guest'
+                      : '${userData?.firstName ?? ''} ${userData?.lastName ?? ''}'
+                          .trim(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  userData?.email ?? '',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

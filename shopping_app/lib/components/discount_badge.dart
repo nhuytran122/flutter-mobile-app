@@ -17,7 +17,7 @@ class DiscountBadge extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
-          '${discount.toStringAsFixed(0)}%',
+          '-${discount.toStringAsFixed(0)}%',
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,

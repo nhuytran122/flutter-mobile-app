@@ -33,7 +33,7 @@ class OrderManager {
     orders.add(order);
   }
 
-  void createOrderFromCart(ShoppingCart cart, String name, String phone,
+  Order createOrderFromCart(ShoppingCart cart, String name, String phone,
       String address, int userID) {
     if (cart.items.isEmpty) {
       throw Exception("Cart is empty. Cannot create an order.");
@@ -52,6 +52,7 @@ class OrderManager {
 
     addOrder(newOrder);
     cart.items.clear();
+    return newOrder;
   }
 }
 

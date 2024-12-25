@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shopping_app/components/appbar.dart';
+import 'package:shopping_app/components/cart_item_card.dart';
 import 'package:shopping_app/components/input_field.dart';
+import 'package:shopping_app/components/total_price_row.dart';
 import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/entity/common_method.dart';
 import 'package:shopping_app/entity/order.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
 import 'package:shopping_app/entity/user.dart';
+import 'package:shopping_app/my_details_product.dart';
 import 'package:shopping_app/thank_you.dart';
 import 'package:shopping_app/utils/navigate_helper.dart';
 import 'package:shopping_app/utils/user_provider.dart';
@@ -33,7 +37,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     userData = Provider.of<UserProvider>(context, listen: false).userData;
   }
 
-  void userTappedPay() {
+  void userTappedConfirm() {
     if (formKey.currentState!.validate()) {
       showDialog(
         context: context,
@@ -53,15 +57,15 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                listOrders.createOrderFromCart(
+              Order order =   listOrders.createOrderFromCart(
                     cart,
                     fullNameController.text,
                     phoneNumberController.text,
                     addressController.text,
                     userData!.id);
-                navigateToScreenNamed(
+                navigateToScreenWithPara(
                   context,
-                  ThankYouScreen.routeName,
+                  ThankYouScreen(order: order),
                   setState,
                 );
               },
@@ -82,89 +86,16 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: myAppBar(context),
+      appBar: myAppBar(context, "Checkout"),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Form(
-              key: formKey,
-              child: Column(
-                children: [
-                  MyCustomInputField(
-                    labelText: 'Full Name',
-                    iconData: Icons.person,
-                    hintText: 'Enter your full name',
-                    obscureText: false,
-                    controller: fullNameController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your full name';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 32),
-                  MyCustomInputField(
-                    labelText: 'Phone Number',
-                    iconData: Icons.phone,
-                    hintText: 'Enter your phone number',
-                    obscureText: false,
-                    controller: phoneNumberController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your phone number';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 32),
-                  MyCustomInputField(
-                    labelText: 'Address',
-                    iconData: Icons.location_on,
-                    hintText: 'Enter your address',
-                    obscureText: false,
-                    controller: addressController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your address';
-                      }
-                      return null;
-                    },
-                  ),
-                ],
-              ),
-            ),
+            _buildFormInput(),
             SizedBox(height: 5),
-            Expanded(
-              child: ListView.builder(
-                itemCount: cart.items.length,
-                itemBuilder: (context, index) {
-                  var item = cart.items[index];
-                  return _buildCartItem(item);
-                },
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Total:',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                Text(
-                  '${CommonMethod.formatPrice(cart.getTotal())}',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,
-                  ),
-                ),
-              ],
+            _buildListItems(),
+            TotalPriceRow(
+              totalPrice: cart.getTotal(),
             ),
             SizedBox(height: 8),
             SizedBox(
@@ -177,9 +108,81 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     );
   }
 
+  Expanded _buildListItems() {
+    return Expanded(
+      child: ListView.builder(
+        itemCount: cart.items.length,
+        itemBuilder: (context, index) {
+          var item = cart.items[index];
+          return CartItemCard(
+            item: item,
+            navigateToProductDetail: (context) {
+              navigateToScreenWithPara(
+                context,
+                ProductDetailPage(productId: item.product.id),
+                setState,
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Form _buildFormInput() {
+    return Form(
+      key: formKey,
+      child: Column(
+        children: [
+          MyCustomInputField(
+            labelText: 'Full Name',
+            iconData: Icons.person,
+            hintText: 'Enter your full name',
+            obscureText: false,
+            controller: fullNameController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your full name';
+              }
+              return null;
+            },
+          ),
+          SizedBox(height: 32),
+          MyCustomInputField(
+            labelText: 'Phone Number',
+            iconData: Icons.phone,
+            hintText: 'Enter your phone number',
+            obscureText: false,
+            controller: phoneNumberController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your phone number';
+              }
+              return null;
+            },
+          ),
+          SizedBox(height: 32),
+          MyCustomInputField(
+            labelText: 'Address',
+            iconData: Icons.location_on,
+            hintText: 'Enter your address',
+            obscureText: false,
+            controller: addressController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your address';
+              }
+              return null;
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   ElevatedButton buildButtonConfirm() {
     return ElevatedButton(
-      onPressed: userTappedPay,
+      onPressed: userTappedConfirm,
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,
         padding: const EdgeInsets.all(16),
@@ -191,86 +194,12 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     );
   }
 
-  Widget _buildCartItem(ItemInCart item) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Container(
-            height: 80,
-            width: 80,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: NetworkImage(item.product.thumbnail),
-                fit: BoxFit.cover,
-              ),
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(item.product.title,
-                    maxLines: 2, overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Text(
-                      CommonMethod.formatPrice(item.product.price),
-                      style: const TextStyle(
-                        color: Colors.redAccent,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      CommonMethod.formatPrice(
-                        CommonMethod.calculateOriginalPrice(item.product.price,
-                            item.product.discountPercentage),
-                      ),
-                      style: const TextStyle(
-                        decoration: TextDecoration.lineThrough,
-                        color: Colors.grey,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 5),
-            child: Text(
-              'x${item.quantity}',
-              style: const TextStyle(fontSize: 14),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  AppBar myAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.primary,
-      leading: IconButton(
-        onPressed: () {
-          Navigator.pop(context);
-        },
-        icon: Icon(
-          Icons.arrow_back,
-          color: Colors.white,
-          size: 30,
-        ),
-      ),
-      centerTitle: true,
-      title: Text(
-        "Checkout",
-        style: TextStyle(color: Colors.white),
-      ),
+  CustomAppBar myAppBar(BuildContext context, String title) {
+    return CustomAppBar(
+      title: title,
+      onBackPressed: () {
+        Navigator.pop(context, true);
+      },
     );
   }
 }

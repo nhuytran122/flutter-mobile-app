@@ -6,7 +6,6 @@ import 'package:shopping_app/my_checkout.dart';
 import 'package:shopping_app/my_profile.dart';
 import 'package:shopping_app/my_shop.dart';
 import 'package:shopping_app/order_history.dart';
-import 'package:shopping_app/thank_you.dart';
 import 'package:shopping_app/utils/user_provider.dart';
 
 void main() {
@@ -29,7 +28,6 @@ class MyApp extends StatelessWidget {
           LoginPage.routeName: (context) => LoginPage(),
           MyShoppingCart.routeName: (context) => MyShoppingCart(),
           CheckOutScreen.routeName: (context) => CheckOutScreen(),
-          ThankYouScreen.routeName: (context) => ThankYouScreen(),
           OrderHistoryScreen.routeName: (context) => OrderHistoryScreen(),
           MyShop.routeName: (context) => MyShop(),
           MyProfileScreen.routeName: (context) => MyProfileScreen(),

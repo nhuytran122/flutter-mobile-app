@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shopping_app/components/icon_cart.dart';
-import 'package:shopping_app/entity/appColor.dart';
+import 'package:shopping_app/components/appbar.dart';
+import 'package:shopping_app/components/discount_badge.dart';
 import 'package:shopping_app/entity/common_method.dart';
-import 'package:shopping_app/entity/constants.dart';
 import 'package:shopping_app/entity/product.dart';
-import 'package:shopping_app/entity/shoppingCart.dart';
 import 'package:shopping_app/my_details_product.dart';
 import 'package:shopping_app/utils/navigate_helper.dart';
 
@@ -23,7 +21,7 @@ class _DiscountedProductsScreenState extends State<DiscountedProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: myAppBar(context),
+      appBar: myAppBar(context, "Top Discounted Products"),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView.builder(
@@ -61,62 +59,11 @@ class _DiscountedProductsScreenState extends State<DiscountedProductsScreen> {
                     ),
                   ),
                   if (item.discountPercentage > 0)
-                    Positioned(
-                      top: 5,
-                      right: 5,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '-${item.discountPercentage.toStringAsFixed(0)}%',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    ),
+                    DiscountBadge(discount: item.discountPercentage),
                 ],
               ),
               const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(item.title,
-                        maxLines: 2, overflow: TextOverflow.ellipsis),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Text(
-                          CommonMethod.formatPrice(item.price),
-                          style: const TextStyle(
-                            color: Colors.redAccent,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          CommonMethod.formatPrice(
-                            CommonMethod.calculateOriginalPrice(
-                                item.price, item.discountPercentage),
-                          ),
-                          style: const TextStyle(
-                            decoration: TextDecoration.lineThrough,
-                            color: Colors.grey,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              _buildDetailInfProduct(item),
               Padding(
                 padding: const EdgeInsets.only(right: 5),
                 child: Text(
@@ -129,44 +76,47 @@ class _DiscountedProductsScreenState extends State<DiscountedProductsScreen> {
         ));
   }
 
-  AppBar myAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.primary,
-      leading: IconButton(
-        onPressed: () {
-          Navigator.pop(context, true);
-        },
-        icon: Icon(
-          Icons.arrow_back,
-          color: Colors.white,
-          size: 30,
-        ),
-      ),
-      centerTitle: true,
-      title: Text(
-        "Top Discounted Products".toUpperCase(),
-        style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: Constants.FONT_SIZE_TITLE),
-      ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 5),
-          child: Stack(
+  Expanded _buildDetailInfProduct(Product item) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(item.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+          const SizedBox(height: 4),
+          Row(
             children: [
-              IconButton(
-                onPressed: () => null,
-                icon: Icon(
-                  Icons.shopping_cart,
-                  color: Colors.white,
+              Text(
+                CommonMethod.formatPrice(item.price),
+                style: const TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              cart.items.length == 0 ? SizedBox.shrink() : MyIconCart(),
+              const SizedBox(width: 8),
+              Text(
+                CommonMethod.formatPrice(
+                  CommonMethod.calculateOriginalPrice(
+                      item.price, item.discountPercentage),
+                ),
+                style: const TextStyle(
+                  decoration: TextDecoration.lineThrough,
+                  color: Colors.grey,
+                  fontSize: 12,
+                ),
+              ),
             ],
           ),
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+
+  CustomAppBar myAppBar(BuildContext context, String title) {
+    return CustomAppBar(
+      title: title,
+      onBackPressed: () {
+        Navigator.pop(context, true);
+      },
     );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shopping_app/entity/appColor.dart';
+import 'package:shopping_app/components/appbar.dart';
 import 'package:shopping_app/entity/product.dart';
 
 class FullReviewPage extends StatelessWidget {
@@ -10,22 +10,22 @@ class FullReviewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text('All Reviews'),
-        backgroundColor: AppColors.primary,
-      ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16.0),
-        itemCount: reviews.length,
-        itemBuilder: (context, index) {
-          return buildReviewCard(reviews[index]);
-        },
-      ),
+      appBar: myAppBar(context, 'All Reviews'),
+      body: buildListReviews(),
     );
   }
 
-  Widget buildReviewCard(Review review) {
+  ListView buildListReviews() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16.0),
+      itemCount: reviews.length,
+      itemBuilder: (context, index) {
+        return _buildReviewCard(reviews[index]);
+      },
+    );
+  }
+
+  Widget _buildReviewCard(Review review) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: Padding(
@@ -40,7 +40,7 @@ class FullReviewPage extends StatelessWidget {
             const SizedBox(height: 4),
             Row(
               children: [
-                const Icon(Icons.star, color: Colors.orange, size: 14),
+                const Icon(Icons.star, color: Colors.yellow, size: 14),
                 const SizedBox(width: 4),
                 Text(review.rating.toString()),
               ],
@@ -50,6 +50,15 @@ class FullReviewPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  CustomAppBar myAppBar(BuildContext context, String title) {
+    return CustomAppBar(
+      title: title,
+      onBackPressed: () {
+        Navigator.pop(context, true);
+      },
     );
   }
 }

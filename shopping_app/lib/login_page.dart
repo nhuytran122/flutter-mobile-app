@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shopping_app/components/input_field.dart';
 import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/my_shop.dart';
 import 'package:shopping_app/utils/api_service.dart';
@@ -7,6 +8,7 @@ import 'package:shopping_app/utils/user_provider.dart';
 
 class LoginPage extends StatefulWidget {
   static String routeName = "/login";
+
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
@@ -14,7 +16,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final formkey = GlobalKey<FormState>();
 
-  // Tạo controller cho email và password
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -30,8 +31,6 @@ class _LoginPageState extends State<LoginPage> {
       if (userData != null) {
         // Lưu userData vào Provider
         Provider.of<UserProvider>(context, listen: false).setUserData(userData);
-
-        // Navigator.pushNamed(context, MyShop.routeName);
         Navigator.pushReplacementNamed(context, MyShop.routeName);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -71,24 +70,25 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 100),
               MyCustomInputField(
-                "Email ",
-                Icons.email_outlined,
-                "Enter your email",
-                false,
+                labelText: "Email",
+                iconData: Icons.email_outlined,
+                hintText: "Enter your email",
+                obscureText: false,
+                controller: emailController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
                   }
                   return null; // Hợp lệ
                 },
-                controller: emailController,
               ),
               SizedBox(height: 32),
               MyCustomInputField(
-                "Password ",
-                Icons.lock_outline,
-                "Enter your password",
-                true,
+                labelText: "Password",
+                iconData: Icons.lock_outline,
+                hintText: "Enter your password",
+                obscureText: true,
+                controller: passwordController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your password';
@@ -98,29 +98,12 @@ class _LoginPageState extends State<LoginPage> {
                   }
                   return null; // Hợp lệ
                 },
-                controller: passwordController,
               ),
               SizedBox(height: 25),
               SizedBox(
                 width: 600,
                 height: 50,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (formkey.currentState!.validate()) {
-                      _login();
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    "Continue",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                ),
+                child: _buildButtonLogin(),
               ),
             ],
           ),
@@ -128,26 +111,24 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-}
 
-Widget MyCustomInputField(
-    String labelText, IconData iconData, String hintText, bool obscureText,
-    {required String? Function(String?) validator, // Thêm tham số validator
-    required TextEditingController controller}) {
-  return TextFormField(
-    obscureText: obscureText,
-    validator: validator, // Sử dụng validator truyền vào
-    controller: controller,
-    decoration: InputDecoration(
-      labelText: labelText,
-      hintText: hintText,
-      hintStyle: TextStyle(color: Colors.grey),
-      floatingLabelBehavior: FloatingLabelBehavior.always,
-      suffixIcon: Icon(iconData),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide(color: Colors.grey),
+  ElevatedButton _buildButtonLogin() {
+    return ElevatedButton(
+      onPressed: () {
+        if (formkey.currentState!.validate()) {
+          _login();
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
       ),
-    ),
-  );
+      child: Text(
+        "Continue",
+        style: TextStyle(color: Colors.white, fontSize: 16),
+      ),
+    );
+  }
 }

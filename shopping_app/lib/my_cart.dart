@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shopping_app/components/icon_cart.dart';
-import 'package:shopping_app/entity/appColor.dart';
+import 'package:shopping_app/components/appbar.dart';
 import 'package:shopping_app/entity/common_method.dart';
-import 'package:shopping_app/entity/constants.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
 import 'package:shopping_app/my_checkout.dart';
 import 'package:shopping_app/my_details_product.dart';
@@ -21,7 +19,7 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: myAppBar(context),
+      appBar: myAppBar(context, 'My Cart'),
       body: Column(
         children: [
           cart.items.isNotEmpty ? _buildShoppingCart() : _buildEmptyCart(),
@@ -49,13 +47,13 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
     return Expanded(
       child: ListView(
         children: [
-          ...cart.items.map((e) => _buildShopSection(e)).toList(),
+          ...cart.items.map((e) => _buildProductSection(e)).toList(),
         ],
       ),
     );
   }
 
-  Widget _buildShopSection(ItemInCart it) {
+  Widget _buildProductSection(ItemInCart it) {
     return GestureDetector(
       onTap: () {
         navigateToScreenWithPara(
@@ -78,115 +76,126 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
             child: Icon(Icons.delete, color: Colors.white),
           ),
         ),
-        child: Card(
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Container(
-                      height: 80,
-                      width: 80,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(it.product.thumbnail),
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
+        child: _buildDetailsItemInCart(it),
+      ),
+    );
+  }
+
+  Card _buildDetailsItemInCart(ItemInCart it) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Container(
+                  height: 80,
+                  width: 80,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage(it.product.thumbnail),
+                      fit: BoxFit.cover,
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            it.product.title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Text(
-                                '${CommonMethod.formatPrice(it.product.price)}',
-                                style: const TextStyle(
-                                  color: Color(0xFFEE4D2D),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${CommonMethod.formatPrice(CommonMethod.calculateOriginalPrice(it.product.price, it.product.discountPercentage))}',
-                                style: const TextStyle(
-                                  decoration: TextDecoration.lineThrough,
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey[300]!),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                cart.addItemInCart(it.product, quantity: -1);
-                              });
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              child: const Icon(Icons.remove, size: 16),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: Text(
-                              '${it.quantity}',
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                if (it.quantity < it.product.stock) {
-                                  cart.addItemInCart(it.product, quantity: 1);
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                          'Cannot add more than available stock!'),
-                                      duration: Duration(seconds: 2),
-                                    ),
-                                  );
-                                }
-                              });
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              child: const Icon(Icons.add, size: 16),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: buildSectionShowPrice(it),
+                ),
+                _buildButtonEditQuantity(it),
+              ],
+            ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Column buildSectionShowPrice(ItemInCart it) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          it.product.title,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
         ),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Text(
+              '${CommonMethod.formatPrice(it.product.price)}',
+              style: const TextStyle(
+                color: Color(0xFFEE4D2D),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              '${CommonMethod.formatPrice(CommonMethod.calculateOriginalPrice(it.product.price, it.product.discountPercentage))}',
+              style: const TextStyle(
+                decoration: TextDecoration.lineThrough,
+                color: Colors.grey,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Container _buildButtonEditQuantity(ItemInCart it) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: () {
+              setState(() {
+                cart.addItemInCart(it.product, quantity: -1);
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              child: const Icon(Icons.remove, size: 16),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              '${it.quantity}',
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
+          InkWell(
+            onTap: () {
+              setState(() {
+                if (it.quantity < it.product.stock) {
+                  cart.addItemInCart(it.product, quantity: 1);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Cannot add more than available stock!'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              child: const Icon(Icons.add, size: 16),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -227,73 +236,45 @@ class _MyShoppingCartState extends State<MyShoppingCart> {
               ),
             ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              navigateToScreenNamed(
-                context,
-                CheckOutScreen.routeName,
-                setState,
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE86343),
-              padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-            child: const Text(
-              'Check Out',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
+          _buildButtonCheckout(),
         ],
       ),
     );
   }
 
-  AppBar myAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.primary,
-      leading: IconButton(
-        onPressed: () {
-          Navigator.pop(context, true);
-        },
-        icon: Icon(
-          Icons.arrow_back,
-          color: Colors.white,
-          size: 30,
+  ElevatedButton _buildButtonCheckout() {
+    return ElevatedButton(
+      onPressed: () {
+        navigateToScreenNamed(
+          context,
+          CheckOutScreen.routeName,
+          setState,
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFFE86343),
+        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
         ),
       ),
-      centerTitle: true,
-      title: Text(
-        "Your Cart".toUpperCase(),
+      child: const Text(
+        'Check Out',
         style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: Constants.FONT_SIZE_TITLE),
-      ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 5),
-          child: Stack(
-            children: [
-              IconButton(
-                onPressed: () => null,
-                icon: Icon(
-                  Icons.shopping_cart,
-                  color: Colors.white,
-                ),
-              ),
-              cart.items.length == 0 ? SizedBox.shrink() : MyIconCart(),
-            ],
-          ),
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
         ),
-      ],
+      ),
+    );
+  }
+
+  CustomAppBar myAppBar(BuildContext context, String title) {
+    return CustomAppBar(
+      title: title,
+      onBackPressed: () {
+        Navigator.pop(context, true);
+      },
     );
   }
 }

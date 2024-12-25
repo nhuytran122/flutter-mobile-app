@@ -15,7 +15,6 @@ import 'package:shopping_app/entity/product.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
 import 'package:shopping_app/entity/user.dart';
 import 'package:shopping_app/filter_products_by_category.dart';
-import 'package:shopping_app/login_page.dart';
 import 'package:shopping_app/my_cart.dart';
 import 'package:shopping_app/my_details_product.dart';
 import 'package:shopping_app/my_profile.dart';
@@ -52,6 +51,47 @@ class _MyShopState extends State<MyShop> {
     lsProduct = ApiService.getAllProducts();
     lsCategories = ApiService.getAllCategories();
     userData = Provider.of<UserProvider>(context, listen: false).userData;
+  }
+
+  List<String> getListTags(List<Product> products) {
+    final tags = <String>{};
+    for (var product in products) {
+      tags.addAll(product.tags);
+    }
+    return tags.toList();
+  }
+
+  List<Product> getTopSaleProducts(List<Product> products) {
+    discountedProducts =
+        products.where((product) => product.discountPercentage > 0).toList();
+    discountedProducts
+        .sort((a, b) => b.discountPercentage.compareTo(a.discountPercentage));
+    return discountedProducts.take(10).toList();
+  }
+
+  void filterProducts() {
+    setState(() {
+      filteredProducts = allProducts.where((product) {
+        final matchesTags = selectedTags.isEmpty ||
+            (product.tags.any((tag) => selectedTags.contains(tag)));
+        final matchesQuery = searchQuery.isEmpty ||
+            product.title.toLowerCase().contains(searchQuery.toLowerCase());
+        return matchesTags && matchesQuery;
+      }).toList();
+
+      noResultsFound = filteredProducts.isEmpty &&
+          (searchQuery.isNotEmpty || selectedTags.isNotEmpty);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      drawer: _buildDrawer(),
+      appBar: _myAppBar(context),
+      body: _getBodyContent(),
+      bottomNavigationBar: _buildBottomNavBar(),
+    );
   }
 
   void _onItemTapped(int index) {
@@ -126,52 +166,11 @@ class _MyShopState extends State<MyShop> {
               ),
               noResultsFound
                   ? _buildNoResultsMessage()
-                  : _buildProductList(filteredProducts),
+                  : buildProductList(filteredProducts),
             ],
           );
         }
       },
-    );
-  }
-
-  List<String> getListTags(List<Product> products) {
-    final tags = <String>{};
-    for (var product in products) {
-      tags.addAll(product.tags);
-    }
-    return tags.toList();
-  }
-
-  List<Product> getTopSaleProducts(List<Product> products) {
-    discountedProducts =
-        products.where((product) => product.discountPercentage > 0).toList();
-    discountedProducts
-        .sort((a, b) => b.discountPercentage.compareTo(a.discountPercentage));
-    return discountedProducts.take(10).toList();
-  }
-
-  void filterProducts() {
-    setState(() {
-      filteredProducts = allProducts.where((product) {
-        final matchesTags = selectedTags.isEmpty ||
-            (product.tags.any((tag) => selectedTags.contains(tag)));
-        final matchesQuery = searchQuery.isEmpty ||
-            product.title.toLowerCase().contains(searchQuery.toLowerCase());
-        return matchesTags && matchesQuery;
-      }).toList();
-
-      noResultsFound = filteredProducts.isEmpty &&
-          (searchQuery.isNotEmpty || selectedTags.isNotEmpty);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: _buildDrawer(),
-      appBar: _myAppBar(context),
-      body: _getBodyContent(),
-      bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
@@ -268,43 +267,12 @@ class _MyShopState extends State<MyShop> {
               padding: const EdgeInsets.all(2.0),
               child: Container(
                 width: 150,
-                child: _buildProductCard(product),
+                child: buildProductCard(product),
               ),
             );
           }).toList(),
         ),
       ),
-    );
-  }
-
-  ProductCard _buildProductCard(Product product) {
-    return ProductCard(
-      product: product,
-      onAddToCart: (product) {
-        setState(() {
-          cart.add(product, quantity: 1);
-        });
-      },
-      onProductTap: () {
-        navigateToScreenWithPara(
-            context, ProductDetailPage(productId: product.id), setState);
-      },
-      isLoggedIn: userData != null,
-    );
-  }
-
-  Widget _buildProductList(List<Product> products) {
-    return GridView.builder(
-      shrinkWrap: true,
-      padding: const EdgeInsets.all(8.0),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        childAspectRatio: 0.7,
-      ),
-      itemCount: products.length,
-      itemBuilder: (context, index) {
-        return _buildProductCard(products[index]);
-      },
     );
   }
 
@@ -331,7 +299,7 @@ class _MyShopState extends State<MyShop> {
               },
               icon: const Icon(
                 Icons.shopping_cart,
-                color: Colors.black,
+                color: Colors.white,
               ),
             ),
             cart.items.length == 0 ? SizedBox.shrink() : MyIconCart(),
@@ -379,6 +347,37 @@ class _MyShopState extends State<MyShop> {
           style: TextStyle(fontSize: 16, color: Colors.red),
         ),
       ),
+    );
+  }
+
+  ProductCard buildProductCard(Product product) {
+    return ProductCard(
+      product: product,
+      onAddToCart: (product) {
+        setState(() {
+          cart.add(product, quantity: 1);
+        });
+      },
+      onProductTap: () {
+        navigateToScreenWithPara(
+            context, ProductDetailPage(productId: product.id), setState);
+      },
+      isLoggedIn: userData != null,
+    );
+  }
+
+  Widget buildProductList(List<Product> products) {
+    return GridView.builder(
+      shrinkWrap: true,
+      padding: const EdgeInsets.all(8.0),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 0.7,
+      ),
+      itemCount: products.length,
+      itemBuilder: (context, index) {
+        return buildProductCard(products[index]);
+      },
     );
   }
 }

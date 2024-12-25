@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:shopping_app/components/icon_cart.dart';
-import 'package:shopping_app/entity/appColor.dart';
+import 'package:provider/provider.dart';
+import 'package:shopping_app/components/product_card.dart';
+import 'package:shopping_app/components/search_appbar.dart';
 import 'package:shopping_app/entity/product.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
+import 'package:shopping_app/entity/user.dart';
 import 'package:shopping_app/my_cart.dart';
 import 'package:shopping_app/my_details_product.dart';
 import 'package:shopping_app/utils/api_service.dart';
 import 'package:shopping_app/utils/navigate_helper.dart';
+import 'package:shopping_app/utils/user_provider.dart';
 
 class CategoryProductsScreen extends StatefulWidget {
   final String category;
@@ -23,14 +26,15 @@ class CategoryProductsScreen extends StatefulWidget {
 class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
   late Future<List<Product>> futureProducts;
   String searchQuery = "";
+  late User? userData;
 
   @override
   void initState() {
     super.initState();
     futureProducts = ApiService.getProductsByCategoryID(widget.category);
+    userData = Provider.of<UserProvider>(context, listen: false).userData;
   }
 
-  // Hàm tìm kiếm sản phẩm theo từ khóa
   Future<List<Product>> searchProducts(String query) async {
     final allProducts =
         await ApiService.getProductsByCategoryID(widget.category);
@@ -42,17 +46,16 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: myAppBar(context),
+      appBar: buildSearchWithCateAppBar(
+          context, 'Search products in ${widget.category} category'),
       body: FutureBuilder<List<Product>>(
         future:
             searchQuery.isEmpty ? futureProducts : searchProducts(searchQuery),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-                child: CircularProgressIndicator()); // Hiển thị loading
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(
-                child: Text("Error: ${snapshot.error}")); // Hiển thị lỗi
+            return Center(child: Text("Error: ${snapshot.error}"));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
               child: Text("No products found in this category."),
@@ -60,177 +63,63 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
           }
 
           final products = snapshot.data!;
-
-          return GridView.builder(
-            padding: const EdgeInsets.all(8.0),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              childAspectRatio: 0.7,
-            ),
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return buildProductCard(product);
-            },
-          );
+          return buildProductList(products);
         },
       ),
     );
   }
 
-  Widget buildProductCard(Product p) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProductDetailPage(
-              productId: p.id,
-            ),
-          ),
-        ).then((value) {
-          if (value == true) {
-            setState(() {
-              futureProducts =
-                  ApiService.getProductsByCategoryID(widget.category);
-            });
-          }
+  Widget buildProductList(List<Product> products) {
+    return GridView.builder(
+      shrinkWrap: true,
+      padding: const EdgeInsets.all(8.0),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 0.7,
+      ),
+      itemCount: products.length,
+      itemBuilder: (context, index) {
+        return buildProductCard(products[index]);
+      },
+    );
+  }
+
+  ProductCard buildProductCard(Product product) {
+    return ProductCard(
+      product: product,
+      onAddToCart: (product) {
+        setState(() {
+          cart.add(product, quantity: 1);
         });
       },
-      child: Container(
-        width: 150,
-        child: Card(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Stack(
-                children: [
-                  Image.network(
-                    p.thumbnail,
-                    height: 80,
-                    width: 120,
-                    fit: BoxFit.cover,
-                  ),
-                  if (p.discountPercentage > 0)
-                    Positioned(
-                      top: 5,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '${p.discountPercentage.toStringAsFixed(0)}%',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(
-                  p.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '\$${p.price}',
-                style: const TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    cart.add(p, quantity: 1);
-                  });
-                },
-                child: const Text("Add to cart"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.secondary,
-                  foregroundColor: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        ),
-      ),
+      onProductTap: () {
+        navigateToScreenWithPara(
+            context, ProductDetailPage(productId: product.id), setState);
+      },
+      isLoggedIn: userData != null,
     );
   }
 
-  AppBar myAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.primary,
-      leading: IconButton(
-        onPressed: () {
-          Navigator.pop(context, true);
-        },
-        icon: Icon(
-          Icons.arrow_back,
-          color: Colors.white,
-          size: 30,
-        ),
-      ),
-      title: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              onChanged: (value) {
-                setState(() {
-                  searchQuery = value;
-                });
-              },
-              decoration: InputDecoration(
-                hintText: 'Search products in ${widget.category} category',
-                hintStyle: TextStyle(color: Colors.white70),
-                border: InputBorder.none,
-                prefixIcon: Icon(Icons.search, color: Colors.white),
-                contentPadding: EdgeInsets.symmetric(vertical: 12),
-              ),
-              style: const TextStyle(color: Colors.white),
-              cursorColor: Colors.white,
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        Stack(
-          children: [
-            IconButton(
-              onPressed: () {
-                navigateToScreenNamed(
-                  context,
-                  MyShoppingCart.routeName,
-                  setState, // Truyền setState để cập nhật giao diện khi quay lại
-                );
-              },
-              icon: const Icon(
-                Icons.shopping_cart,
-                color: Colors.black,
-              ),
-            ),
-            cart.items.isEmpty ? const SizedBox.shrink() : MyIconCart(),
-          ],
-        ),
-      ],
+  CustomSearchAppBar buildSearchWithCateAppBar(
+      BuildContext context, String hintTextTitle) {
+    return CustomSearchAppBar(
+      hintText: hintTextTitle,
+      onBackPressed: () {
+        Navigator.pop(context, true);
+      },
+      onCartPressed: () {
+        navigateToScreenNamed(
+          context,
+          MyShoppingCart.routeName,
+          setState,
+        );
+      },
+      searchQuery: searchQuery,
+      onSearchChanged: (value) {
+        setState(() {
+          searchQuery = value;
+        });
+      },
     );
   }
 }

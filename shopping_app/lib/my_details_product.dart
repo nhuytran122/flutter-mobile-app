@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shopping_app/components/appbar.dart';
+import 'package:shopping_app/components/product_card.dart';
 import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/entity/common_method.dart';
 import 'package:shopping_app/entity/product.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
+import 'package:shopping_app/entity/user.dart';
 import 'package:shopping_app/filter_products_by_category.dart';
-import 'package:shopping_app/my_cart.dart';
+import 'package:shopping_app/login_page.dart';
 import 'package:shopping_app/my_reviews_page.dart';
 import 'package:shopping_app/utils/api_service.dart';
 import 'package:shopping_app/utils/navigate_helper.dart';
+import 'package:shopping_app/utils/user_provider.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final int productId;
@@ -25,11 +30,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   int quantity = 1;
   Product? product;
   List<Product> relatedProducts = [];
+  late User? userData;
 
   @override
   void initState() {
     super.initState();
     fetchProductDetails();
+    userData = Provider.of<UserProvider>(context, listen: false).userData;
   }
 
   Future<void> fetchProductDetails() async {
@@ -61,7 +68,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     if (product == null) {
       return Scaffold(
@@ -74,91 +80,37 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     }
 
     return Scaffold(
-      appBar: myAppBar(context),
+      appBar: myAppBar(context, product!.title),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Stack(
-                alignment: Alignment.topRight,
-                children: [
-                  Center(
-                    child: Image.network(
-                      product!.thumbnail,
-                      height: 250,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.orange,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        '${product!.rating} ⭐',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              _buildImgWithRate(),
               const SizedBox(height: 16),
               Text(product!.title,
                   style: const TextStyle(
                       fontSize: 22, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              buildSectionPrice(),
+              _buildSectionPrice(),
               const SizedBox(height: 16),
               Text(product!.description, style: const TextStyle(fontSize: 14)),
               const Divider(height: 32),
-              buildActionAddToCart(context),
+              _buildActionAddToCart(context),
               const Divider(height: 32),
-              GestureDetector(
-                  onTap: () {
-                    navigateToScreenWithPara(
-                        context,
-                        CategoryProductsScreen(category: product!.category),
-                        setState);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Category:',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          product!.category,
-                          style: TextStyle(
-                            color: AppColors.secondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )),
-              buildDetailRow('Brand:', product!.brand ?? 'N/A'),
-              buildDetailRow('Stock:', '${product!.stock} items'),
-              buildDetailRow('Weight:', '${product!.weight} kg'),
-              buildDetailRow(
+              _buildShowCategory(context),
+              _buildDetailRow('Brand:', product!.brand ?? 'N/A'),
+              _buildDetailRow('Stock:', '${product!.stock} items'),
+              _buildDetailRow('Weight:', '${product!.weight} kg'),
+              _buildDetailRow(
                   'Warranty Information:', product!.warrantyInformation),
-              buildDetailRow(
+              _buildDetailRow(
                   'Shipping Information:', product!.shippingInformation),
-              buildDetailRow('Availability:', product!.availabilityStatus),
-              buildDetailRow('Return Policy:', product!.returnPolicy),
+              _buildDetailRow('Availability:', product!.availabilityStatus),
+              _buildDetailRow('Return Policy:', product!.returnPolicy),
               const Divider(height: 32),
-              buildSubTitle("Tags: "),
+              _buildSubTitle("Tags: "),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -166,32 +118,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     product!.tags.map((tag) => Chip(label: Text(tag))).toList(),
               ),
               const Divider(height: 32),
-              buildSubTitle("More Images:"),
+              _buildSubTitle("More Images:"),
               const SizedBox(height: 8),
-              SizedBox(
-                height: 100,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: product!.images.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Image.network(
-                        product!.images[index],
-                        height: 100,
-                        fit: BoxFit.contain,
-                      ),
-                    );
-                  },
-                ),
-              ),
+              _buildShowMoreImg(),
               const Divider(height: 32),
-              buildSubTitle("Reviews:"),
+              _buildSubTitle("Reviews:"),
               const SizedBox(height: 8),
               Column(
                 children: product!.reviews
                     .take(2)
-                    .map((review) => buildReviewCard(review))
+                    .map((review) => _buildReviewCard(review))
                     .toList(),
               ),
               if (product!.reviews.length > 2)
@@ -210,12 +146,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ),
                   ),
                 ),
-              buildSubTitle("Related Products:"),
+              _buildSubTitle("Related Products:"),
               const SizedBox(height: 8),
               relatedProducts.isNotEmpty
                   ? SizedBox(
                       height: 220,
-                      child: buildRelatedProducts(),
+                      child: _buildRelatedProducts(),
                     )
                   : const Center(
                       child: Text('No related products available.'),
@@ -227,7 +163,97 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
-  Row buildActionAddToCart(BuildContext context) {
+  GestureDetector _buildShowCategory(BuildContext context) {
+    return GestureDetector(
+        onTap: () {
+          navigateToScreenWithPara(context,
+              CategoryProductsScreen(category: product!.category), setState);
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Category:',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                product!.category,
+                style: TextStyle(
+                  color: AppColors.secondary,
+                ),
+              ),
+            ],
+          ),
+        ));
+  }
+
+  SizedBox _buildShowMoreImg() {
+    return SizedBox(
+      height: 100,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: product!.images.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Image.network(
+              product!.images[index],
+              height: 100,
+              fit: BoxFit.contain,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Stack _buildImgWithRate() {
+    return Stack(
+      alignment: Alignment.topRight,
+      children: [
+        Center(
+          child: Image.network(
+            product!.thumbnail,
+            height: 250,
+            fit: BoxFit.contain,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.orange,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${product!.rating}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.star,
+                  color: Colors.yellow,
+                  size: 16,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Row _buildActionAddToCart(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -286,17 +312,31 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             ],
           ),
         ),
-        buildButtonAddToCart(),
+        _buildButtonAddToCart(),
       ],
     );
   }
 
-  ElevatedButton buildButtonAddToCart() {
+  ElevatedButton _buildButtonAddToCart() {
     return ElevatedButton.icon(
       onPressed: () {
-        setState(() {
-          cart.add(product!, quantity: quantity);
-        });
+        if (userData == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Please log in to add items to the cart.'),
+              action: SnackBarAction(
+                label: 'Log in',
+                onPressed: () {
+                  navigateToScreenNamed(context, LoginPage.routeName, setState);
+                },
+              ),
+            ),
+          );
+        } else {
+          setState(() {
+            cart.add(product!, quantity: quantity);
+          });
+        }
       },
       icon: const Icon(Icons.shopping_cart),
       label: const Text("Add to Cart"),
@@ -311,7 +351,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
-  Row buildSectionPrice() {
+  Row _buildSectionPrice() {
     return Row(
       children: [
         Text(
@@ -332,7 +372,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
-  ListView buildRelatedProducts() {
+  ListView _buildRelatedProducts() {
     return ListView.builder(
       scrollDirection: Axis.horizontal,
       itemCount: relatedProducts.length,
@@ -352,133 +392,30 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
-  Widget buildSubTitle(String subTitle) {
+  Widget _buildSubTitle(String subTitle) {
     return Text(
       subTitle,
       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
     );
   }
 
-  Widget buildRelatedProductCard(Product p) {
-    return GestureDetector(
-      onTap: () {
-        navigateToScreenWithPara(
-            context, ProductDetailPage(productId: p.id), setState);
+  ProductCard buildRelatedProductCard(Product product) {
+    return ProductCard(
+      product: product,
+      onAddToCart: (product) {
+        setState(() {
+          cart.add(product, quantity: 1);
+        });
       },
-      child: Container(
-        width: 150,
-        child: Card(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Stack(
-                children: [
-                  Image.network(
-                    p.thumbnail,
-                    height: 80,
-                    width: 120,
-                    fit: BoxFit.cover,
-                  ),
-                  if (p.discountPercentage > 0)
-                    Positioned(
-                      top: 5,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '${p.discountPercentage.toStringAsFixed(0)}%',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(
-                  p.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${CommonMethod.formatPrice(p.price)}',
-                style: const TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    cart.add(p, quantity: 1);
-                  });
-                },
-                child: const Text("Add to cart"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.secondary,
-                  foregroundColor: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        ),
-      ),
+      onProductTap: () {
+        navigateToScreenWithPara(
+            context, ProductDetailPage(productId: product.id), setState);
+      },
+      isLoggedIn: userData != null,
     );
   }
 
-  AppBar myAppBar(BuildContext context) {
-    return AppBar(
-      centerTitle: true,
-      backgroundColor: AppColors.primary,
-      leading: IconButton(
-        onPressed: () {
-          Navigator.pop(context, true);
-        },
-        icon: Icon(Icons.arrow_back, color: Colors.white, size: 30),
-      ),
-      title: Text(
-        product!.title,
-        style: const TextStyle(color: Colors.white),
-      ),
-      actions: [
-        Stack(
-          children: [
-            IconButton(
-              onPressed: () {
-                navigateToScreenNamed(
-                  context,
-                  MyShoppingCart.routeName,
-                  setState,
-                );
-              },
-              icon: const Icon(Icons.shopping_cart, color: Colors.black),
-            ),
-            cart.items.length == 0 ? SizedBox.shrink() : buildCartIcon(),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget buildDetailRow(String title, String value) {
+  Widget _buildDetailRow(String title, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
@@ -494,7 +431,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
-  Widget buildReviewCard(Review review) {
+  Widget _buildReviewCard(Review review) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: Padding(
@@ -522,28 +459,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
-  Widget buildCartIcon() {
-    return Positioned(
-      right: 5,
-      top: 5,
-      child: Container(
-        height: 15,
-        width: 15,
-        decoration: const BoxDecoration(
-          color: Colors.red,
-          shape: BoxShape.circle,
-        ),
-        child: Center(
-          child: Text(
-            '${cart.items.length}',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
+  CustomAppBar myAppBar(BuildContext context, String title) {
+    return CustomAppBar(
+      title: title,
+      onBackPressed: () {
+        Navigator.pop(context, true);
+      },
     );
   }
 }

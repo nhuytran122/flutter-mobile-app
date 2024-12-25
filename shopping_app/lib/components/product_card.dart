@@ -10,13 +10,13 @@ class ProductCard extends StatelessWidget {
   final Product product;
   final Function(Product) onAddToCart;
   final VoidCallback onProductTap;
-  final bool isLoggedIn; // Thêm tham số trạng thái đăng nhập
+  final bool isLoggedIn;
 
   ProductCard({
     required this.product,
     required this.onAddToCart,
     required this.onProductTap,
-    required this.isLoggedIn, // Đánh dấu là required
+    required this.isLoggedIn,
   });
 
   @override

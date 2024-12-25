@@ -15,7 +15,20 @@ class AddToCartButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: isLoggedIn ? onAddToCart : onLoginTap,
+      onPressed: isLoggedIn
+          ? onAddToCart
+          : () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content:
+                      const Text('Please log in to add items to the cart.'),
+                  action: SnackBarAction(
+                    label: 'Log in',
+                    onPressed: onLoginTap,
+                  ),
+                ),
+              );
+            },
       child: const Text("Add to cart"),
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.secondary,
