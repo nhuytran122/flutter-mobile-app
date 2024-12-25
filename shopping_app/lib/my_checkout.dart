@@ -8,7 +8,6 @@ import 'package:shopping_app/entity/appColor.dart';
 import 'package:shopping_app/entity/common_method.dart';
 import 'package:shopping_app/entity/order.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
-import 'package:shopping_app/entity/user.dart';
 import 'package:shopping_app/my_details_product.dart';
 import 'package:shopping_app/thank_you.dart';
 import 'package:shopping_app/utils/navigate_helper.dart';
@@ -29,15 +28,14 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   final fullNameController = TextEditingController();
   final phoneNumberController = TextEditingController();
   final addressController = TextEditingController();
-  late User? userData;
 
   @override
   void initState() {
     super.initState();
-    userData = Provider.of<UserProvider>(context, listen: false).userData;
   }
 
   void userTappedConfirm() {
+    final userData = Provider.of<UserProvider>(context, listen: false).userData;
     if (formKey.currentState!.validate()) {
       showDialog(
         context: context,
@@ -57,7 +55,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
           actions: [
             TextButton(
               onPressed: () {
-              Order order =   listOrders.createOrderFromCart(
+                Order order = listOrders.createOrderFromCart(
                     cart,
                     fullNameController.text,
                     phoneNumberController.text,

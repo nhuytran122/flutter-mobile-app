@@ -15,6 +15,7 @@ import 'package:shopping_app/entity/product.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
 import 'package:shopping_app/entity/user.dart';
 import 'package:shopping_app/filter_products_by_category.dart';
+import 'package:shopping_app/login_page.dart';
 import 'package:shopping_app/my_cart.dart';
 import 'package:shopping_app/my_details_product.dart';
 import 'package:shopping_app/my_profile.dart';
@@ -176,7 +177,6 @@ class _MyShopState extends State<MyShop> {
 
   MyDrawer _buildDrawer() {
     return MyDrawer(
-      userData: userData,
       onIndexSelected: (index) {
         setState(() {
           _selectedIndex = index;
@@ -186,19 +186,36 @@ class _MyShopState extends State<MyShop> {
   }
 
   BottomNavigationBar _buildBottomNavBar() {
+    final isLoggedIn = userData != null;
     return BottomNavigationBar(
       currentIndex: _selectedIndex,
-      onTap: _onItemTapped,
+      onTap: (index) {
+        if (!isLoggedIn && index != 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Please log in to access this feature.'),
+              action: SnackBarAction(
+                label: 'Log in',
+                onPressed: () {
+                  navigateToScreenNamed(context, LoginPage.routeName, setState);
+                },
+              ),
+            ),
+          );
+          return;
+        }
+        _onItemTapped(index);
+      },
       items: [
-        BottomNavigationBarItem(
+        const BottomNavigationBarItem(
           icon: Icon(Icons.home),
           label: "Home",
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.history),
+          icon: const Icon(Icons.history),
           label: "Orders History (${listOrders.orders.length})",
         ),
-        BottomNavigationBarItem(
+        const BottomNavigationBarItem(
           icon: Icon(Icons.person),
           label: "My Profile",
         ),

@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shopping_app/entity/appColor.dart';
-import 'package:shopping_app/entity/user.dart';
+import 'package:shopping_app/login_page.dart';
+import 'package:shopping_app/utils/user_provider.dart';
 
-class MyDrawer extends StatelessWidget {
-  final User? userData;
+class MyDrawer extends StatefulWidget {
   final ValueChanged<int> onIndexSelected;
 
   const MyDrawer({
     Key? key,
-    required this.userData,
     required this.onIndexSelected,
   }) : super(key: key);
 
   @override
+  State<MyDrawer> createState() => _MyDrawerState();
+}
+
+class _MyDrawerState extends State<MyDrawer> {
+  @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final isLoggedIn = userProvider.userData != null;
+
     return Container(
       width: MediaQuery.of(context).size.width * 2 / 3,
       decoration: const BoxDecoration(color: Colors.white),
@@ -25,31 +33,67 @@ class MyDrawer extends StatelessWidget {
             icon: Icons.home_outlined,
             label: 'Home',
             onTap: () {
-              onIndexSelected(0);
+              widget.onIndexSelected(0);
               Navigator.pop(context);
             },
+          ),
+          if (isLoggedIn)
+            _buildDrawerItem(
+              context,
+              icon: Icons.person_outline,
+              label: 'My Profile',
+              onTap: () {
+                widget.onIndexSelected(2);
+                Navigator.pop(context);
+              },
+            ),
+          const Divider(),
+          _buildDrawerItem(
+            context,
+            icon: Icons.contact_emergency,
+            label: 'Contact',
           ),
           _buildDrawerItem(
             context,
-            icon: Icons.person_outline,
-            label: 'My Profile',
-            onTap: () {
-              onIndexSelected(2);
-              Navigator.pop(context);
-            },
+            icon: Icons.settings_outlined,
+            label: 'Setting',
           ),
-          const Divider(),
-          _buildDrawerItem(context,
-              icon: Icons.contact_emergency, label: 'Contact'),
-          _buildDrawerItem(context,
-              icon: Icons.settings_outlined, label: 'Setting'),
-          _buildDrawerItem(context, icon: Icons.help_outline, label: 'Help'),
+          _buildDrawerItem(
+            context,
+            icon: Icons.help_outline,
+            label: 'Help',
+          ),
+          Divider(),
+          if (isLoggedIn)
+            _buildDrawerItem(
+              context,
+              icon: Icons.logout_outlined,
+              label: 'Logout',
+              onTap: () {
+                _logout(context);
+              },
+            ),
+          if (!isLoggedIn)
+            _buildDrawerItem(
+              context,
+              icon: Icons.login_outlined,
+              label: 'Login',
+              onTap: () {
+                Navigator.pushNamed(context, LoginPage.routeName);
+              },
+            ),
         ],
       ),
     );
   }
 
+  Future<void> _logout(BuildContext context) async {
+    Provider.of<UserProvider>(context, listen: false).setUserData(null);
+    Navigator.pop(context);
+  }
+
   DrawerHeader _buildDrawerHeader() {
+    final userData = Provider.of<UserProvider>(context, listen: false).userData;
     return DrawerHeader(
       decoration: const BoxDecoration(
         color: AppColors.primary,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shopping_app/entity/appColor.dart';
-import 'package:shopping_app/entity/user.dart';
 import 'package:shopping_app/utils/user_provider.dart';
 
 class MyProfileScreen extends StatefulWidget {
@@ -14,13 +13,9 @@ class MyProfileScreen extends StatefulWidget {
 }
 
 class _MyProfileScreenState extends State<MyProfileScreen> {
-  late User? userData;
-
   @override
   void initState() {
     super.initState();
-    // userData = Provider.of<UserProvider>(context).userData;
-    userData = Provider.of<UserProvider>(context, listen: false).userData;
   }
 
   @override
@@ -31,6 +26,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   }
 
   Widget myProfileBody() {
+    final userData = Provider.of<UserProvider>(context, listen: false).userData;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -46,12 +42,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           ),
           SizedBox(height: 16),
           Text(
-            '${userData?.firstName ?? ''} ${userData?.lastName ?? ''}'
-                    .trim()
-                    .isEmpty
-                ? 'Guest'
-                : '${userData?.firstName ?? ''} ${userData?.lastName ?? ''}'
-                    .trim(),
+            '${userData?.firstName ?? ''} ${userData?.lastName ?? ''}',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -67,28 +58,18 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           ),
           SizedBox(height: 20),
           if (userData != null) ...[
-            buildInforUser(
-                "Email", userData?.email.toString() ?? '', Icons.mail),
-            buildInforUser(
-                "Age", userData?.age.toString() ?? '', Icons.numbers),
-            buildInforUser("Gender", userData?.gender ?? "", Icons.person),
-            buildInforUser(
-                "Phone", userData?.phone.toString() ?? '', Icons.phone),
-            buildInforUser("Birth Date", userData?.birthDate.toString() ?? '',
+            buildInforUser("Email", userData.email.toString(), Icons.mail),
+            buildInforUser("Age", userData.age.toString(), Icons.numbers),
+            buildInforUser("Gender", userData.gender, Icons.person),
+            buildInforUser("Phone", userData.phone.toString(), Icons.phone),
+            buildInforUser("Birth Date", userData.birthDate.toString(),
                 Icons.calendar_today),
             buildInforUser(
               "Address",
-              "${userData?.address.address}, ${userData?.address.city}, ${userData?.address.state}",
+              "${userData.address.address}, ${userData.address.city}, ${userData.address.state}",
               Icons.location_on,
             ),
-          ] else ...[
-            buildInforUser("Email", 'Not available', Icons.mail),
-            buildInforUser("Age", 'Not available', Icons.numbers),
-            buildInforUser("Gender", 'Not available', Icons.person),
-            buildInforUser("Phone", 'Not available', Icons.phone),
-            buildInforUser("Birth Date", 'Not available', Icons.calendar_today),
-            buildInforUser("Address", 'Not available', Icons.location_on),
-          ],
+          ]
         ],
       ),
     );

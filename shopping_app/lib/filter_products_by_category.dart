@@ -4,7 +4,6 @@ import 'package:shopping_app/components/product_card.dart';
 import 'package:shopping_app/components/search_appbar.dart';
 import 'package:shopping_app/entity/product.dart';
 import 'package:shopping_app/entity/shoppingCart.dart';
-import 'package:shopping_app/entity/user.dart';
 import 'package:shopping_app/my_cart.dart';
 import 'package:shopping_app/my_details_product.dart';
 import 'package:shopping_app/utils/api_service.dart';
@@ -26,13 +25,11 @@ class CategoryProductsScreen extends StatefulWidget {
 class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
   late Future<List<Product>> futureProducts;
   String searchQuery = "";
-  late User? userData;
 
   @override
   void initState() {
     super.initState();
     futureProducts = ApiService.getProductsByCategoryID(widget.category);
-    userData = Provider.of<UserProvider>(context, listen: false).userData;
   }
 
   Future<List<Product>> searchProducts(String query) async {
@@ -85,6 +82,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
   }
 
   ProductCard buildProductCard(Product product) {
+    final userData = Provider.of<UserProvider>(context, listen: false).userData;
     return ProductCard(
       product: product,
       onAddToCart: (product) {
